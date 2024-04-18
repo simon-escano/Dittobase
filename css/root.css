@@ -1,0 +1,24 @@
+:root {
+    --white: white;
+    --white-alpha: #ffffff80;
+    --black: black;
+    --black-alpha: rgba(0, 0, 0, 0.295);
+    --primary: #7d18de;
+    --primary-verylight: #cfb6e6;
+    --primary-light: #a977d8;
+    --primary-dark: #39135c;
+    --primary-outline: #2c0736;
+    --secondary: #f856ab;
+    --secondary-verylight: #ffacd7;
+    --secondary-light: #ff6db8;
+
+    --outline: 2px solid var(--primary-outline);
+    --text-outline: 1px 1px 0px var(--primary-outline);
+
+    --shadow: 2px 2px 0px var(--black-alpha);
+    --shadow-emboss: 2px 2px 0px var(--black-alpha), inset 0px 2px 0px var(--white-alpha), inset -2px -2px 0px var(--black-alpha);
+    --deshadow-emboss: -2px -2px 0px var(--black-alpha), inset 0px 2px 0px var(--white-alpha), inset -2px -2px 0px var(--black-alpha);
+    --deshadow-deboss: -2px -2px 0px var(--black-alpha), inset 0px -2px 0px var(--white-alpha), inset 2px 2px 0px var(--black-alpha);
+    --emboss: inset 0px 2px 0px var(--white-alpha), inset -2px -2px 0px var(--black-alpha);
+    --deboss: inset 0px -2px 0px var(--white-alpha), inset 2px 2px 0px var(--black-alpha);
+}

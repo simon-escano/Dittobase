@@ -133,6 +133,9 @@ function card($img, $title, $content) {
 }
 
 function part($orientation, $content) {
+    if (is_callable($content)) {
+        $content = $content();
+    }
     return '
     <div class="partition-'. $orientation .'">' .
     $content .

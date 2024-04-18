@@ -19,8 +19,21 @@ class Database {
         if (!empty($where)) {
             $sql .= " WHERE $where";
         }
-        return $this->query($sql);
-    }
+        $result = $this->query($sql);
+    
+        if (!$result) {
+            return [];
+        }
+    
+        $rows = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $rows[] = $row;
+        }
+    
+        mysqli_free_result($result);
+    
+        return $rows;
+    }    
 
     public function insert($table, $data) {
         $columns = implode(', ', array_keys($data));
@@ -44,6 +57,42 @@ class Database {
         return $result;
     }
 
+    public function delete($table, $where = '') {
+        $sql = "DELETE FROM $table";
+        if (!empty($where)) {
+            $sql .= " WHERE $where";
+        }
+        return $this->query($sql);
+    }
+    
+    public function update($table, $data, $where = '') {
+        $setClause = '';
+        foreach ($data as $column => $value) {
+            $setClause .= "$column = ?, ";
+        }
+        $setClause = rtrim($setClause, ', ');
+    
+        $sql = "UPDATE $table SET $setClause";
+        if (!empty($where)) {
+            $sql .= " WHERE $where";
+        }
+    
+        $stmt = mysqli_prepare($this->conn, $sql);
+        if (!$stmt) {
+            return false;
+        }
+    
+        $types = str_repeat('s', count($data));
+        $values = array_values($data);
+        mysqli_stmt_bind_param($stmt, $types, ...$values);
+    
+        $result = mysqli_stmt_execute($stmt);
+    
+        mysqli_stmt_close($stmt);
+    
+        return $result;
+    }    
+
     public function close() {
         mysqli_close($this->conn);
     }
@@ -57,12 +106,10 @@ class Card {
         $this->img = $img;
         $this->title = $title;
         $this->content = $content;
-
-        $this->html();
     }
 
     public function html() {
-        echo '
+        return '
         <div class="card">
             <section class="card-header">
                 <div class="card-img-box">
@@ -76,6 +123,21 @@ class Card {
         </div>
         ';
     }
+}
+
+function card($img, $title, $content) {
+    if (is_callable($content)) {
+        $content = $content();
+    }
+    return (new Card($img, $title, $content))->html();
+}
+
+function part($orientation, $content) {
+    return '
+    <div class="partition-'. $orientation .'">' .
+    $content .
+    '</div>
+    ';
 }
 
 ?>

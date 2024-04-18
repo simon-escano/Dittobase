@@ -1,12 +1,5 @@
 <?php
 require 'php/connect.php';
-
-$pokedex = $db->select('tblPokedex', '*');
-$pokemon = $db->select('tblPokemon', '*');
-$battles = $db->select('tblBattle', '*');
-$trainers = $db->select('tblTrainerAccount', '*');
-$arenas = $db->select('tblArena', '*');
-
 ?>
 
 <!DOCTYPE html>
@@ -49,15 +42,56 @@ $arenas = $db->select('tblArena', '*');
         <main>
             <div class="partition-v">
                 <div class="partition-v">
+                    <div class="partition-h">
                     <?php
                         if ($currentUser) {
-                            foreach ($trainers as $trainer) {
-                                if ($trainer['trainerAccountID'] == $currentUser) {
-                                    new Card("icon_pokeball.png", "Hello, " . $trainer['firstname'] . "!", "Welcome to DittoBase!");
+                            $trainers = $db->select('tblTrainerAccount', '*', "trainerAccountID='". $currentUser ."'");
+                            echo part('v', 
+                                card("icon_pokeball.png", "Hello, " . $trainers['0']['firstname'] . "!", "Welcome to Dittobase!") .
+                                card("icon_pokeball.png", "Your Pokemon Team", function() use($db, $currentUser) {
+                                    $html = '';
+                                    $pokemonTeam = $db->select("tblPokemonTeam", "*", "trainerAccountID='". $currentUser ."'")['0'];
+                                    for ($i = 1; $i <= 6; $i++) {
+                                        $chosenPokemon = $pokemonTeam['chosenPokemon' . $i];
+                                        if (!$chosenPokemon) continue;
+                                        $chosenPokemon = $db->select("tblPokedex", "*", "pokedexID='". $chosenPokemon ."'")['0'];
+                                        $html .= '<div class="card-pokemon"><p>'. $chosenPokemon['name'] .'</p></div>';
+                                    }
+                                    return $html;
+                                })
+                            );
+                            
+                            echo card("icon_pokeball.png", "Your Pokemon", function() use($db, $currentUser) {
+                                $trainerPokemon = $db->select('tblTrainerPokemon', '*', "trainerAccountID='" . $currentUser . "'")['0'];
+                                $html = '';
+                                for ($i = 1; $i <= 10; $i++) {
+                                    $currentPokemon = $trainerPokemon['pokemon' . $i];
+                                    if (!$currentPokemon) continue;
+
+                                    $pokemon = $db->select('tblPokemon', '*', "spawnID='" . $currentPokemon . "'")['0'];
+                                    $dex = $db->select('tblPokedex', '*', "pokedexID='" . $pokemon['pokedexID'] . "'")['0'];
+
+                                    $html .= 
+                                        '<div class="card-pokemon">' . 
+                                        '<p>' . $dex['name'] . '</p>' .
+                                        '<form method="post" action="add_to_team.php">' .
+                                        '<input type="hidden" name="pokemonID" value="' . $pokemon['pokedexID'] . '">' .
+                                        '<input type="hidden" name="trainerID" value="' . $currentUser . '">' .
+                                        '<input id="add-to-team-button" type="submit" name="add_to_team" value="ADD TO TEAM">' .
+                                        '</form>' . 
+                                        '<form method="post" action="free_pokemon.php">' . // Change action to the PHP script that handles the free action
+                                        '<input type="hidden" name="trainerID" value="' . $currentUser . '">' . // Include a hidden input to pass the Pokemon ID
+                                        '<input type="hidden" name="pokemonPos" value="pokemon' . $i . '">' . // Include a hidden input to pass the Pokemon ID
+                                        '<input type="hidden" name="pokemonID" value="' . $pokemon['pokedexID'] . '">' . // Include a hidden input to pass the Pokemon ID
+                                        '<input id="free-button" type="submit" name="free_pokemon" value="FREE">' .  // Name the submit button for handling in PHP
+                                        '</form>' .
+                                        '</div>';
                                 }
-                            }
+                                return $html;
+                            });
                         }
                     ?>
+                    </div>
                     <div class="card">
                         <section class="card-header">
                             <div class="card-img-box">
@@ -67,10 +101,11 @@ $arenas = $db->select('tblArena', '*');
                         </section>
                         <section id="pokedex" class="card-content">
                         <?php
+                            $arenas = $db->select('tblArena', '*');
                             foreach ($arenas as $arena) {
-                                new Card("icon_pokeball.png", $arena['name'], '
-                                <p class="dex-moves"> Located in '. $arena['region'] .'</p>
-                                <p class="arena-badge"> Fight in '. $arena['name'] .' to get the <span>'. $arena['badge'] . '!</span></p>
+                                echo card("icon_pokeball.png", $arena['name'], '
+                                    <p class="dex-moves"> Located in '. $arena['region'] .'</p>
+                                    <p class="arena-badge"> Fight in '. $arena['name'] .' to get the <span>'. $arena['badge'] . '!</span></p>
                                 ');
                             }
                         ?>
@@ -87,12 +122,13 @@ $arenas = $db->select('tblArena', '*');
                         </section>
                         <section id="pokedex" class="card-content">
                         <?php
+                        $pokedex = $db->select("tblPokedex", "*");
                         foreach ($pokedex as $dex) {
                             $dex['move1'] .= ", " . $dex['move2'] .= ", " . $dex['move3'];
                             if ($dex['type2'] != 'None') {
                                 $dex['type1'] .= ", " . $dex['type2'];
                             }
-                            new Card("icon_pokeball.png", $dex['name'], '
+                            echo card("icon_pokeball.png", $dex['name'], '
                                 <p class="dex-types">Types: '. $dex['type1'] . '</p>
                                 <p class="dex-moves">Moves: '. $dex['move1'] .'</p>
                                 <p class="dex-desc">'. $dex['description'] .'</p>
@@ -110,19 +146,12 @@ $arenas = $db->select('tblArena', '*');
                         </section>
                         <section id="pokedex" class="card-content">
                         <?php
+                            $battles = $db->select('tblBattle', '*');
                             foreach ($battles as $battle) {
-                                $opp1Name;
-                                $opp2Name;
-                                foreach ($trainers as $trainer) {
-                                    if ($battle['firstOpponent'] == $trainer['trainerAccountID']) {
-                                        $opp1Name = $trainer['firstname'];
-                                    }
-                                    if ($battle['secondOpponent'] == $trainer['trainerAccountID']) {
-                                        $opp2Name = $trainer['firstname'];
-                                    }
-                                }
+                                $opp1Name = $db->select('tblTrainerAccount', '*', "trainerAccountID='". $battle['firstOpponent'] ."'")['0']['firstname'];
+                                $opp2Name = $db->select('tblTrainerAccount', '*', "trainerAccountID='". $battle['secondOpponent'] ."'")['0']['firstname'];
                                 $winner = ($battle['isFirstOpponentWinner']) ? $opp1Name : $opp2Name;
-                                new Card("icon_pokeball.png", $opp1Name . " vs. " . $opp2Name, '
+                                echo card("icon_pokeball.png", $opp1Name . " vs. " . $opp2Name, '
                                     <p class="dex-moves"> Battle date: '. $battle['battleDate'] .'</p>
                                     <p class="battle-winner">'. $winner . ' won this battle! </p>
                                 ');

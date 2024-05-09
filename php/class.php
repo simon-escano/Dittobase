@@ -33,7 +33,25 @@ class Database {
         mysqli_free_result($result);
     
         return $rows;
-    }    
+    }
+
+    public function select2($selectQuery) {
+        $sql = $selectQuery;
+        $result = $this->query($sql);
+
+        if (!$result) {
+            return [];
+        }
+
+        $rows = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $rows[] = $row;
+        }
+
+        mysqli_free_result($result);
+
+        return $rows;
+    }
 
     public function insert($table, $data) {
         $columns = implode(', ', array_keys($data));

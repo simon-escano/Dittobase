@@ -1,5 +1,6 @@
 <?php
 require 'php/connect.php';
+global $currentUser;
 ?>
 
 <!DOCTYPE html>

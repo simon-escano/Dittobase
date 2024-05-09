@@ -207,9 +207,9 @@ input, select {
 
 .submit-button {
     white-space: nowrap;
-    overflow: hidden;
+    /* overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 20%;
+    max-width: 20%; */
     background-color: var(--secondary);
     color: white;
     box-shadow: var(--shadow-emboss);

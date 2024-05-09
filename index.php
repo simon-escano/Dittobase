@@ -33,6 +33,9 @@ require 'php/connect.php';
                 } else {
                     echo '<button id="login" class="nav-button">LOGOUT <span>▶</span></button>';
                 }
+                if ($currentUser == 45) {
+                    echo '<button id="admin" class="nav-button">ADMIN <span>▶</span></button>';
+                }
             ?>
             <button id="home" class="nav-button">HOME <span>▶</span></button>
             <button id="about-us" class="nav-button">ABOUT US <span>▶</span></button>
@@ -51,42 +54,46 @@ require 'php/connect.php';
                             card("icon_pokeball.png", "Hello, " . $trainers['0']['firstname'] . "!", "Welcome to Dittobase!") .
                             card("icon_pokeball.png", "Your Pokemon Team", function() use($db, $currentUser) {
                                 $html = '';
-                                $pokemonTeam = $db->select("tblPokemonTeam", "*", "trainerAccountID='". $currentUser ."'")['0'];
-                                for ($i = 1; $i <= 6; $i++) {
-                                    $chosenPokemon = $pokemonTeam['chosenPokemon' . $i];
-                                    if (!$chosenPokemon) continue;
-                                    $chosenPokemon = $db->select("tblPokedex", "*", "pokedexID='". $chosenPokemon ."'")['0'];
-                                    $html .= '<div class="card-pokemon"><p>'. $chosenPokemon['name'] .'</p></div>';
+                                if ($pokemonTeam = $db->select("tblPokemonTeam", "*", "trainerAccountID='". $currentUser ."'")) {
+                                    $pokemonTeam = $pokemonTeam['0'];
+                                    for ($i = 1; $i <= 6; $i++) {
+                                        $chosenPokemon = $pokemonTeam['chosenPokemon' . $i];
+                                        if (!$chosenPokemon) continue;
+                                        $chosenPokemon = $db->select("tblPokedex", "*", "pokedexID='". $chosenPokemon ."'")['0'];
+                                        $html .= '<div class="card-pokemon"><p>'. $chosenPokemon['name'] .'</p></div>';
+                                    }
                                 }
                                 return $html;
                             })
                         );
                         
                         $html .= card("icon_pokeball.png", "Your Pokemon", function() use($db, $currentUser) {
-                            $trainerPokemon = $db->select('tblTrainerPokemon', '*', "trainerAccountID='" . $currentUser . "'")['0'];
                             $html = '';
-                            for ($i = 1; $i <= 10; $i++) {
-                                $currentPokemon = $trainerPokemon['pokemon' . $i];
-                                if (!$currentPokemon) continue;
-
-                                $pokemon = $db->select('tblPokemon', '*', "spawnID='" . $currentPokemon . "'")['0'];
-                                $dex = $db->select('tblPokedex', '*', "pokedexID='" . $pokemon['pokedexID'] . "'")['0'];
-
-                                $html .= 
-                                    '<div class="card-pokemon">' . 
-                                    '<p>' . $dex['name'] . '</p>' .
-                                    '<form method="post" action="add_to_team.php">' .
-                                    '<input type="hidden" name="pokemonID" value="' . $pokemon['pokedexID'] . '">' .
-                                    '<input type="hidden" name="trainerID" value="' . $currentUser . '">' .
-                                    '<input id="add-to-team-button" type="submit" name="add_to_team" value="ADD TO TEAM">' .
-                                    '</form>' . 
-                                    '<form method="post" action="free_pokemon.php">' . // Change action to the PHP script that handles the free action
-                                    '<input type="hidden" name="trainerID" value="' . $currentUser . '">' . // Include a hidden input to pass the Pokemon ID
-                                    '<input type="hidden" name="pokemonPos" value="pokemon' . $i . '">' . // Include a hidden input to pass the Pokemon ID
-                                    '<input type="hidden" name="pokemonID" value="' . $pokemon['pokedexID'] . '">' . // Include a hidden input to pass the Pokemon ID
-                                    '<input id="free-button" type="submit" name="free_pokemon" value="FREE">' .  // Name the submit button for handling in PHP
-                                    '</form>' .
-                                    '</div>';
+                            if ($trainerPokemon = $db->select('tblTrainerPokemon', '*', "trainerAccountID='" . $currentUser . "'")) {
+                                $trainerPokemon = $trainerPokemon['0'];
+                                for ($i = 1; $i <= 10; $i++) {
+                                    $currentPokemon = $trainerPokemon['pokemon' . $i];
+                                    if (!$currentPokemon) continue;
+    
+                                    $pokemon = $db->select('tblPokemon', '*', "spawnID='" . $currentPokemon . "'")['0'];
+                                    $dex = $db->select('tblPokedex', '*', "pokedexID='" . $pokemon['pokedexID'] . "'")['0'];
+    
+                                    $html .= 
+                                        '<div class="card-pokemon">' . 
+                                        '<p>' . $dex['name'] . '</p>' .
+                                        '<form method="post" action="add_to_team.php">' .
+                                        '<input type="hidden" name="pokemonID" value="' . $pokemon['pokedexID'] . '">' .
+                                        '<input type="hidden" name="trainerID" value="' . $currentUser . '">' .
+                                        '<input id="add-to-team-button" type="submit" name="add_to_team" value="ADD TO TEAM">' .
+                                        '</form>' . 
+                                        '<form method="post" action="free_pokemon.php">' . // Change action to the PHP script that handles the free action
+                                        '<input type="hidden" name="trainerID" value="' . $currentUser . '">' . // Include a hidden input to pass the Pokemon ID
+                                        '<input type="hidden" name="pokemonPos" value="pokemon' . $i . '">' . // Include a hidden input to pass the Pokemon ID
+                                        '<input type="hidden" name="pokemonID" value="' . $pokemon['pokedexID'] . '">' . // Include a hidden input to pass the Pokemon ID
+                                        '<input id="free-button" type="submit" name="free_pokemon" value="FREE">' .  // Name the submit button for handling in PHP
+                                        '</form>' .
+                                        '</div>';
+                                }
                             }
                             return $html;
                         });

@@ -100,7 +100,27 @@ require 'php/connect.php';
                         return $html;
                     }
                 })
-            ) .
+            ) . card("icon_pokeball.png", "DASHBOARD", card("icon_pokeball.png", "NUMBER OF BATTLES", function() use($db) {
+                $html = "";
+                $numOfBattles = $db->select("tblBattle", "count(isFirstOpponentWinner) as numOfBattles", "firstOpponent='" . $_SESSION['trainerID'] . "' OR secondOpponent='" . $_SESSION['trainerID'] . "'");
+                if ($numOfBattles) $numOfBattles = $numOfBattles['0'];
+                $_SESSION['numOfBattles'] = $numOfBattles['numOfBattles'];
+                $html .= "<p>" . $numOfBattles['numOfBattles'] . "</p>";
+                return $html;
+            }) . card("icon_pokeball.png", "WINRATE", function() use($db) {
+                $html = "";
+                $numOfWins = $db->select("tblBattle", "count(isFirstOpponentWinner) as numOfWins", "isFirstOpponentWinner=1 AND firstOpponent='" . $_SESSION['trainerID'] . "'");
+                $numOfWins2 = $db->select("tblBattle", "count(isFirstOpponentWinner) as numOfWins", "isFirstOpponentWinner=0 AND secondOpponent='" . $_SESSION['trainerID'] . "'");
+                if ($numOfWins && $numOfWins2) {
+                    $numOfWins = $numOfWins['0'];
+                    $numOfWins2 = $numOfWins2['0'];
+                }
+                $totalWins = $numOfWins['numOfWins'] + $numOfWins2['numOfWins'];
+                $winRate = ($totalWins / (float) $_SESSION['numOfBattles']) * 100;
+                $_SESSION['winRate'] = $winRate;
+                $html .= $winRate . "%";
+                return $html;
+            })) .
             card("icon_pokeball.png", "ARENAS", function() use($db) {
                 $html = '';
                 $arenas = $db->select('tblArena', '*');

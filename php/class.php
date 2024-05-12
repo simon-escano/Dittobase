@@ -143,22 +143,57 @@ class Card {
     }
 }
 
-function card($img, $title, $content) {
-    if (is_callable($content)) {
-        $content = $content();
+function card($img, $title) {
+    $args = func_get_args();
+    $contents = "";
+    array_shift($args);
+    array_shift($args);
+    foreach ($args as $content) {
+        if (is_callable($content)) {
+            $content = $content();
+        }
+        $contents .= $content;
     }
-    return (new Card($img, $title, $content))->html();
+    return (new Card($img, $title, $contents))->html();
 }
 
-function part($orientation, $content) {
-    if (is_callable($content)) {
-        $content = $content();
+function part($orientation) {
+    $args = func_get_args();
+    $contents = "";
+    array_shift($args);
+    foreach ($args as $content) {
+        if (is_callable($content)) {
+            $content = $content();
+        }
+        $contents .= $content;
     }
-    return '
-    <div class="partition-'. $orientation .'">' .
-    $content .
-    '</div>
-    ';
+    return '<div class="partition-'. $orientation .'">' . $contents .'</div>';
+}
+
+function div($class) {
+    $args = func_get_args();
+    $contents = "";
+    array_shift($args);
+    foreach ($args as $content) {
+        if (is_callable($content)) {
+            $content = $content();
+        }
+        $contents .= $content;
+    }
+    return '<div class="' . $class . '">'. $contents .'</div>';
+}
+
+function p($class) {
+    $args = func_get_args();
+    $contents = "";
+    array_shift($args);
+    foreach ($args as $content) {
+        if (is_callable($content)) {
+            $content = $content();
+        }
+        $contents .= $content;
+    }
+    return '<p class="' . $class . '">'. $contents .'</p>';
 }
 
 ?>

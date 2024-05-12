@@ -11,12 +11,20 @@
     --secondary: #f856ab;
     --secondary-verylight: #ffacd7;
     --secondary-light: #ff6db8;
+    --red: #d2232a;
+    --yellow: #faeb01;
+    --green: #39b54a;
+    --blue: #00aeef;
+    --gray: #f1f2f2;
+    --dark-gray: #58595b;
 
     --outline: 2px solid var(--primary-outline);
     --text-outline: 1px 1px 0px var(--primary-outline);
 
     --shadow: 2px 2px 0px var(--black-alpha);
     --shadow-emboss: 2px 2px 0px var(--black-alpha), inset 0px 2px 0px var(--white-alpha), inset -2px -2px 0px var(--black-alpha);
+    --halflight-emboss: inset 0px 2px 0px var(--white-alpha), inset -2px 0px 0px var(--black-alpha);
+    --shadow-halfdark-emboss: 2px 2px 0px var(--black-alpha), inset 0px 0px 0px var(--white-alpha), inset -2px -2px 0px var(--black-alpha);
     --deshadow-emboss: -2px -2px 0px var(--black-alpha), inset 0px 2px 0px var(--white-alpha), inset -2px -2px 0px var(--black-alpha);
     --deshadow-deboss: -2px -2px 0px var(--black-alpha), inset 0px -2px 0px var(--white-alpha), inset 2px 2px 0px var(--black-alpha);
     --emboss: inset 0px 2px 0px var(--white-alpha), inset -2px -2px 0px var(--black-alpha);

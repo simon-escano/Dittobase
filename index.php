@@ -170,7 +170,9 @@ if (!isset($_SESSION['pokedexIndex'])) {
                                         div("pokedex-top-button green")
                                     ),
                                     div("pokedex-top-right",
-                                        div("pokedex-top-right-box")
+                                        div("pokedex-top-right-box",
+                                            p("", "POKEDEX")
+                                        )
                                     )
                                 ),
                                 div("pokedex-bottom",

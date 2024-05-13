@@ -444,10 +444,11 @@ header, footer {
 
 .pokedex-top-right-box {
     display: flex;
+    justify-content: flex-end;
     border-bottom: var(--outline);
     box-shadow: var(--shadow-emboss);
     background-color: var(--red);
-    padding: 16px;
+    padding: 7px 16px;
     gap: 4px;
 }
 

@@ -5,6 +5,18 @@
     color: var(--white);
     text-shadow: var(--text-outline);
     font-family: "Pixelify Sans";
+    transition: all 0.15s;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+button {
+    cursor: pointer;
 }
 
 ol, ul {
@@ -318,6 +330,58 @@ header, footer {
             cursor: pointer;
             padding: 4px 8px;
         }
+    }
+}
+
+.arenas {
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+.arena {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    padding: 12px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: var(--primary);
+}
+
+.arena-name {
+    font-size: 24px;
+    text-align: center;
+}
+
+.arena-description {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    padding: 6px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    background-color: var(--secondary-light);
+    box-shadow: var(--shadow-emboss);
+} .arena-description:hover {
+    opacity: 1;
+}
+
+.arena-description-text {
+    text-align: center;
+
+    span {
+        font-weight: bold;
     }
 }
 

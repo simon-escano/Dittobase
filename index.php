@@ -139,17 +139,24 @@ if (!isset($_SESSION['pokedexIndex'])) {
                         )
                     ) : "",
                     part('v',
-                        card("icon_pokeball.png", "ARENAS", 
-                            function() use($db) {
-                                $html = '';
-                                $arenas = $db->select('tblArena', 'name, region, badge');
-                                foreach ($arenas as $arena) {
-                                    $html .= card("icon_pokeball.png", $arena['name'], 
-                                        p("dex-moves", "Located in", $arena['region']),
-                                        p("arena-badge", "Fight in ", $arena['name'], " to get <span>", $arena['badge'], "!</span>"));
+                        card("icon_pokeball.png", "ARENAS",
+                            div("arenas",
+                                function() use($db) {
+                                    $html = "";
+                                    $arenas = $db->select('tblArena', 'name, region, badge');
+                                    foreach ($arenas as $arena) {
+                                        $html .=
+                                        div("arena",
+                                            p("", "Located in ", $arena['region']),
+                                            p("arena-name", $arena['name']),
+                                            div("arena-description",
+                                                p("arena-description-text", "Fight in ", $arena['name'], " to get <span>", $arena['badge'], "!</span>")
+                                            )
+                                        );
+                                    }
+                                    return $html;
                                 }
-                                return $html;
-                            }
+                            )
                         ),
                         part("h",
                             div("pokedex", "#pokedex",

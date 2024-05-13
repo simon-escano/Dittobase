@@ -176,13 +176,13 @@ function div($class) {
     $id = "";
     array_shift($args);
     foreach ($args as $content) {
+        if (is_callable($content)) {
+            $content = $content();
+        }
         if (str_starts_with($content, "#")) {
             $content = substr($content, 1);
             $id = $content;
             continue;
-        }
-        if (is_callable($content)) {
-            $content = $content();
         }
         $contents .= $content;
     }

@@ -280,12 +280,6 @@ header, footer {
     color: var(--primary-dark);
 }
 
-.battle-winner {
-    font-size: 20px;
-    text-align: center;
-    padding: 16px 0px;
-}
-
 .arena-badge {
     font-size: 20px;
     margin-top: -2px;
@@ -349,13 +343,22 @@ header, footer {
     padding: 12px;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     background-color: var(--primary);
 }
 
 .arena-name {
     font-size: 24px;
     text-align: center;
+}
+
+.arena-location {
+    background-color: var(--secondary);
+    padding: 3px 6px;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    text-align: center;
+    width: 100%;
 }
 
 .arena-description {
@@ -537,8 +540,9 @@ header, footer {
 
 .pokedex-buttons {
     display: flex;
-    align-items: flex-start;
-    gap: 8px;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
 }
 
 .pokedex-button {
@@ -574,11 +578,16 @@ header, footer {
 }
 
 .pokedex-trackpad {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: var(--green);
     border: var(--outline);
     box-shadow: var(--deshadow-deboss);
     height: 50px;
     border-radius: 5px;
+    flex: 1;
+    padding: 16px;
 }
 
 .pokedex-result {
@@ -618,6 +627,7 @@ header, footer {
     border: var(--outline);
     box-shadow: var(--shadow-emboss);
     margin-top: -2px;
+    overflow-x: auto;
 }
 
 .pokedex-description {
@@ -656,22 +666,6 @@ header, footer {
     flex: 1;
 }
 
-.add-to-team-button, .free-button {
-    background-color: var(--primary);
-    border: var(--outline);
-    box-shadow: var(--shadow-emboss);
-    padding: 3px 6px;
-    height: 100%;
-}
-
-.pokemon-name {
-    flex: 1;
-    background-color: var(--secondary);
-    border: var(--outline);
-    box-shadow: var(--shadow-emboss);
-    padding: 3px 6px;
-}
-
 .pie-chart-container {
     display: flex;
     flex-direction: column;
@@ -703,4 +697,144 @@ header, footer {
     border-radius: 50%;
     width: 140px;
     height: 140px;
+}
+
+.pokemons {
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.pokemon {
+    display: flex;
+    flex-direction: column;
+}
+
+.pokemon-name {
+    padding: 3px 6px;
+    width: 100%;
+    background-color: var(--primary);
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    background-color: var(--primary);
+    margin-bottom: -2px;
+}
+
+.pokemon-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--white);
+    padding: 12px;
+    padding-top: 0px;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    margin-bottom: -2px;
+}
+
+.pokemon-image {
+    width: 100%;
+    max-width: 100px;
+    aspect-ratio: 1;
+}
+
+.pokemon-buttons {
+    display: flex;
+    width: 100%;
+}
+
+.add-to-team-button, .free-button, .remove-from-team-button {
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    padding: 3px 6px;
+    height: 100%;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.add-to-team-button-form {
+    flex: 1;
+    margin-right: -2px;
+}
+
+.add-to-team-button {
+    background-color: var(--green);
+}
+
+.free-button, .remove-from-team-button {
+    background-color: var(--red);
+}
+
+.button-form {
+    display: flex;
+    flex: 1;
+}
+
+#your-pokemon-team {
+    max-height: 400px;
+}
+
+#welcome-card {
+    flex: initial;
+}
+
+.battles {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.battle {
+    display: flex;
+    flex-direction: column;
+}
+
+.battle-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.battle-winner, .battle-loser {
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    padding: 3px 24px;
+}
+
+.battle-winner {
+    background-color: var(--green);
+}
+
+.battle-loser {
+    background-color: var(--red);
+}
+
+.battle-body {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: var(--primary);
+    padding: 8px;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    margin-top: -2px;
+
+    p {
+        font-size: 24px;
+    }
+
+    .vs {
+        font-size: 34px;
+        font-weight: bold;
+    }
+}
+
+.battle-date {
+    width: 100%;
+    background-color: var(--primary-dark);
+    padding: 3px 6px;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    text-align: center;
+    margin-top: -2px;
 }

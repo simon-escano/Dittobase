@@ -120,15 +120,17 @@ class Card {
     public $img;
     public $title;
     public $content;
-    public function __construct($img, $title, $content) {
+    public $id;
+    public function __construct($img, $title, $content, $id) {
         $this->img = $img;
         $this->title = $title;
         $this->content = $content;
+        $this->id = $id;
     }
 
     public function html() {
         return '
-        <div class="card">
+        <div id="'. $this->id .'" class="card">
             <section class="card-header">
                 <div class="card-img-box">
                     <img src="img/'. $this->img .'">
@@ -146,15 +148,21 @@ class Card {
 function card($img, $title) {
     $args = func_get_args();
     $contents = "";
+    $id = "";
     array_shift($args);
     array_shift($args);
     foreach ($args as $content) {
         if (is_callable($content)) {
             $content = $content();
         }
+        if (str_starts_with($content, "#")) {
+            $content = substr($content, 1);
+            $id = $content;
+            continue;
+        }
         $contents .= $content;
     }
-    return (new Card($img, $title, $contents))->html();
+    return (new Card($img, $title, $contents, $id))->html();
 }
 
 function part($orientation) {
@@ -224,7 +232,7 @@ function button($action, $class, $content) {
         }
     }
     return '
-    <form action="'. $action .'.php" method="post">
+    <form class="'. $class .'-form" action="'. $action .'.php" method="post">
         '. $values .'
         <button class="'. $class .'" name="'. $action .'" type="submit">'. $content .'</button>
     </form>

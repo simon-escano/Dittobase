@@ -1,5 +1,12 @@
 <?php
 require 'php/connect.php';
+
+$pokedex = $db->select("tblPokedex", "name, type1, type2, move1, move2, move3, description, image");
+
+if (!isset($_SESSION['pokedexIndex'])) {
+    $_SESSION['pokedexIndex'] = 0;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -43,166 +50,198 @@ require 'php/connect.php';
         </nav>
 
         <main>
-        <?php
-        echo part('v', 
-            part('v',
-                part('h', function() use($db, $currentUser) {
-                    // $html = '';
-                    // if ($currentUser) {
-                    //     $trainers = $db->select('tblTrainerAccount', '*', "trainerAccountID='". $currentUser ."'");
-                    //     $html .= part('v', 
-                    //         card("icon_pokeball.png", "Hello, " . $trainers['0']['firstname'] . "!", "Welcome to Dittobase!") .
-                    //         card("icon_pokeball.png", "Your Pokemon Team", function() use($db, $currentUser) {
-                    //             $html = '';
-                    //             if ($pokemonTeam = $db->select("tblPokemonTeam", "*", "trainerAccountID='". $currentUser ."'")) {
-                    //                 $pokemonTeam = $pokemonTeam['0'];
-                    //                 for ($i = 1; $i <= 6; $i++) {
-                    //                     $chosenPokemon = $pokemonTeam['chosenPokemon' . $i];
-                    //                     if (!$chosenPokemon) continue;
-                    //                     $chosenPokemon = $db->select("tblPokedex", "*", "pokedexID='". $chosenPokemon ."'")['0'];
-                    //                     $html .= '<div class="card-pokemon"><p>'. $chosenPokemon['name'] .'</p></div>';
-                    //                 }
-                    //             }
-                    //             return $html;
-                    //         })
-                    //     );
-                        
-                    //     $html .= card("icon_pokeball.png", "Your Pokemon", function() use($db, $currentUser) {
-                    //         $html = '';
-                    //         if ($trainerPokemon = $db->select('tblTrainerPokemon', '*', "trainerAccountID='" . $currentUser . "'")) {
-                    //             $trainerPokemon = $trainerPokemon['0'];
-                    //             for ($i = 1; $i <= 10; $i++) {
-                    //                 $currentPokemon = $trainerPokemon['pokemon' . $i];
-                    //                 if (!$currentPokemon) continue;
-    
-                    //                 $pokemon = $db->select('tblPokemon', '*', "spawnID='" . $currentPokemon . "'")['0'];
-                    //                 $dex = $db->select('tblPokedex', '*', "pokedexID='" . $pokemon['pokedexID'] . "'")['0'];
-    
-                    //                 $html .= 
-                    //                     '<div class="card-pokemon">' . 
-                    //                     '<p>' . $dex['name'] . '</p>' .
-                    //                     '<form method="post" action="add_to_team.php">' .
-                    //                     '<input type="hidden" name="pokemonID" value="' . $pokemon['pokedexID'] . '">' .
-                    //                     '<input type="hidden" name="trainerID" value="' . $currentUser . '">' .
-                    //                     '<input id="add-to-team-button" type="submit" name="add_to_team" value="ADD TO TEAM">' .
-                    //                     '</form>' . 
-                    //                     '<form method="post" action="free_pokemon.php">' . // Change action to the PHP script that handles the free action
-                    //                     '<input type="hidden" name="trainerID" value="' . $currentUser . '">' . // Include a hidden input to pass the Pokemon ID
-                    //                     '<input type="hidden" name="pokemonPos" value="pokemon' . $i . '">' . // Include a hidden input to pass the Pokemon ID
-                    //                     '<input type="hidden" name="pokemonID" value="' . $pokemon['pokedexID'] . '">' . // Include a hidden input to pass the Pokemon ID
-                    //                     '<input id="free-button" type="submit" name="free_pokemon" value="FREE">' .  // Name the submit button for handling in PHP
-                    //                     '</form>' .
-                    //                     '</div>';
-                    //             }
-                    //         }
-                    //         return $html;
-                    //     });
-                    //     return $html;
-                    // }
-                })
-            ) . card("icon_pokeball.png", "DASHBOARD", card("icon_pokeball.png", "NUMBER OF BATTLES", function() use($db) {
-                // $html = "";
-                // $numOfBattles = $db->select("tblBattle", "count(isFirstOpponentWinner) as numOfBattles", "firstOpponent='" . $currentUser . "' OR secondOpponent='" . $currentUser . "'");
-                // if ($numOfBattles) $numOfBattles = $numOfBattles['0'];
-                // $_SESSION['numOfBattles'] = $numOfBattles['numOfBattles'];
-                // $html .= "<p>" . $numOfBattles['numOfBattles'] . "</p>";
-                // return $html;
-            }) . card("icon_pokeball.png", "WINRATE", function() use($db) {
-                // $html = "";
-                // $numOfWins = $db->select("tblBattle", "count(isFirstOpponentWinner) as numOfWins", "isFirstOpponentWinner=1 AND firstOpponent='" . $currentUser . "'");
-                // $numOfWins2 = $db->select("tblBattle", "count(isFirstOpponentWinner) as numOfWins", "isFirstOpponentWinner=0 AND secondOpponent='" . $currentUser . "'");
-                // if ($numOfWins && $numOfWins2) {
-                //     $numOfWins = $numOfWins['0'];
-                //     $numOfWins2 = $numOfWins2['0'];
-                // }
-                // $totalWins = $numOfWins['numOfWins'] + $numOfWins2['numOfWins'];
-                // $winRate = ($totalWins / (float) $_SESSION['numOfBattles']) * 100;
-                // $_SESSION['winRate'] = $winRate;
-                // $html .= $winRate . "%";
-                // return $html;
-            })) .
-            card("icon_pokeball.png", "ARENAS", function() use($db) {
-                // $html = '';
-                // $arenas = $db->select('tblArena', '*');
-                // foreach ($arenas as $arena) {
-                //     $html .= card("icon_pokeball.png", $arena['name'], '
-                //         <p class="dex-moves"> Located in '. $arena['region'] .'</p>
-                //         <p class="arena-badge"> Fight in '. $arena['name'] .' to get the <span>'. $arena['badge'] . '!</span></p>
-                //     ');
-                // }
-                // return $html;
-            }) . 
-            part("h",
-                div("pokedex",
-                    div("pokedex-top",
-                        div("pokedex-top-left",
-                            div("pokedex-lens",
-                                div("pokedex-lens-glass")
-                            ),
-                            div("pokedex-top-button red"),
-                            div("pokedex-top-button yellow"),
-                            div("pokedex-top-button green")
-                        ),
-                        div("pokedex-top-right",
-                            div("pokedex-top-right-box")
-                        )
-                    ),
-                    div("pokedex-bottom",
-                        div("pokedex-screen",
-                            div("pokedex-screen-content"),
-                            div("pokedex-screen-buttons",
-                                div("pokedex-screen-button"),
-                                div("pokedex-speaker",
-                                    "<hr>", "<hr>", "<hr>", "<hr>",
+            <?php
+                echo 
+                part('v',
+                    ($currentUser) ? part('v',
+                        part('h',
+                            part('v',
+                                card("icon_pokeball.png", "HELLO, " . $db->select("tblTrainerAccount", "firstname", "trainerAccountID='". $currentUser ."'")[0]["firstname"] . "!",
+                                    "Welcome to Dittobase!"
+                                ),
+                                card("icon_pokeball.png", "YOUR POKEMON TEAM",
+                                    function() use($db, $currentUser) {
+                                        $html = "";
+                                        $team = $db->select("tblPokemonTeam", "chosenPokemon1, chosenPokemon2, chosenPokemon3, chosenPokemon4, chosenPokemon5, chosenPokemon6", "trainerAccountID='". $currentUser ."'");
+                                        if ($team) {
+                                            $team = $team[0];
+                                            $pokemonIds = array_filter($team);
+                                            $pokemonIds = array_values($pokemonIds);
+
+                                            if (!empty($pokemonIds)) {
+                                                $joins = [
+                                                    ['tblPokedex p', 'p.pokedexID = t.chosenPokemon1 OR p.pokedexID = t.chosenPokemon2 OR p.pokedexID = t.chosenPokemon3 OR p.pokedexID = t.chosenPokemon4 OR p.pokedexID = t.chosenPokemon5 OR p.pokedexID = t.chosenPokemon6']
+                                                ];
+                                                $columns = 'p.name';
+                                                $where = 't.trainerAccountID = "' . $currentUser . '"';
+                                                $pokemonNames = $db->select("tblPokemonTeam t", $columns, $where, $joins);
+
+                                                foreach ($pokemonNames as $pokemon) {
+                                                    $html .= $pokemon['name'];
+                                                }
+                                            }
+                                        }
+                                        return $html;
+                                    }
                                 )
+                            ),
+                            card("icon_pokeball.png", "YOUR POKEMON",
+                                function() use($db, $currentUser) {
+                                    $html = '';
+                                    $trainerPokemon = $db->select('tblTrainerPokemon', '*', "trainerAccountID='" . $currentUser . "'");
+                                    if ($trainerPokemon) {
+                                        $trainerPokemon = $trainerPokemon[0];
+
+                                        $joins = [
+                                            ['tblPokemon p', 'p.spawnID = t.pokemon1 OR p.spawnID = t.pokemon2 OR p.spawnID = t.pokemon3 OR p.spawnID = t.pokemon4 OR p.spawnID = t.pokemon5 OR p.spawnID = t.pokemon6 OR p.spawnID = t.pokemon7 OR p.spawnID = t.pokemon8 OR p.spawnID = t.pokemon9 OR p.spawnID = t.pokemon10'],
+                                            ['tblPokedex d', 'd.pokedexID = p.pokedexID']
+                                        ];
+
+                                        $columns = 'p.spawnID AS pokemonID, d.name AS pokemonName';
+                                        $where = 't.trainerAccountID = "' . $currentUser . '"';
+                                        $pokemonData = $db->select('tblTrainerPokemon t', $columns, $where, $joins);
+                                        
+                                        $i = 1;
+                                        foreach ($pokemonData as $data) {
+                                            $html .=
+                                            div("pokemon-record",
+                                                p("pokemon-name", $data['pokemonName']),
+                                                button("add_to_team", "add-to-team-button", "ADD TO TEAM",
+                                                    ["pokemonID" => $data['pokemonID']],
+                                                    ["trainerID" => $currentUser],
+                                                ),
+                                                button("free_pokemon", "free-button", "FREE",
+                                                    ["pokemonID" => $data['pokemonID']],
+                                                    ["trainerID" => $currentUser],
+                                                    ["pokemonPos" => "pokemon" . $i],
+                                                ),
+                                            );
+                                            $i++;
+                                        }
+                                    }
+                                    return $html;
+                                }
                             )
                         ),
-                        div("pokedex-buttons",
-                            div("pokedex-button"),
-                            div("pokedex-button-group",
-                                div("pokedex-line-buttons",
-                                    div("pokedex-line-button red"),
-                                    div("pokedex-line-button blue"),
-                                ),
-                                div("pokedex-trackpad")
+                        card("icon_pokeball.png", "DASHBOARD",
+                            card("icon_pokeball.png", "NUMBER OF BATTLES",
+                                function() use($db, $currentUser) {
+                                    $sql = "SELECT COUNT(isFirstOpponentWinner) as numOfBattles FROM tblBattle WHERE firstOpponent='$currentUser' OR secondOpponent='$currentUser'";
+                                    $numOfBattles = $db->select2($sql);
+                                    $numOfBattles = $numOfBattles[0]['numOfBattles'];
+                                    $_SESSION['numOfBattles'] = $numOfBattles;
+                                    return $numOfBattles;
+                                }
                             ),
-                            div("pokedex-button")
+                            card("icon_pokeball.png", "WIN RATE",
+                                function() use($db, $currentUser) {
+                                    $numOfWins = $db->select("tblBattle", "SUM(CASE WHEN isFirstOpponentWinner = 1 AND firstOpponent = '$currentUser' THEN 1 ELSE 0 END) AS numOfWins1,
+                                    SUM(CASE WHEN isFirstOpponentWinner = 0 AND secondOpponent = '$currentUser' THEN 1 ELSE 0 END) AS numOfWins2", "(firstOpponent = '$currentUser' AND isFirstOpponentWinner = 1) OR (secondOpponent = '$currentUser' AND isFirstOpponentWinner = 0)");
+                                    $numOfWins1 = $numOfWins[0]['numOfWins1'];
+                                    $numOfWins2 = $numOfWins[0]['numOfWins2'];
+                                    $totalWins = $numOfWins1 + $numOfWins2;
+                                    $winRate = $_SESSION['numOfBattles'] > 0 ? ($totalWins / $_SESSION['numOfBattles']) * 100 : 0;
+                                    $_SESSION['winRate'] = $winRate;
+                                    return $winRate . "%";
+                                }
+                            )
+                        )
+                    ) : "",
+                    part('v',
+                        card("icon_pokeball.png", "ARENAS", 
+                            function() use($db) {
+                                $html = '';
+                                $arenas = $db->select('tblArena', 'name, region, badge');
+                                foreach ($arenas as $arena) {
+                                    $html .= card("icon_pokeball.png", $arena['name'], 
+                                        p("dex-moves", "Located in", $arena['region']),
+                                        p("arena-badge", "Fight in ", $arena['name'], " to get <span>", $arena['badge'], "!</span>"));
+                                }
+                                return $html;
+                            }
+                        ),
+                        part("h",
+                            div("pokedex", "#pokedex",
+                                div("pokedex-top",
+                                    div("pokedex-top-left",
+                                        div("pokedex-lens",
+                                            div("pokedex-lens-glass")
+                                        ),
+                                        div("pokedex-top-button red"),
+                                        div("pokedex-top-button yellow"),
+                                        div("pokedex-top-button green")
+                                    ),
+                                    div("pokedex-top-right",
+                                        div("pokedex-top-right-box")
+                                    )
+                                ),
+                                div("pokedex-bottom",
+                                    div("pokedex-screen",
+                                        div("pokedex-screen-content",
+                                            div("pokedex-result",
+                                                div("pokedex-header", 
+                                                    p("pokedex-name", $pokedex[$_SESSION['pokedexIndex']]['name']),
+                                                    part("h non-flex",
+                                                        p("pokedex-type", $pokedex[$_SESSION['pokedexIndex']]['type1']),
+                                                        ($pokedex[$_SESSION['pokedexIndex']]['type2'] != "None") ? p("pokedex-type", $pokedex[$_SESSION['pokedexIndex']]['type2']) : ""
+                                                    )
+                                                ),
+                                                div("pokedex-body",
+                                                    img($pokedex[$_SESSION['pokedexIndex']]['image'], "pokedex-image"),
+                                                    p("pokedex-description", $pokedex[$_SESSION['pokedexIndex']]['description'])
+                                                ),
+                                                div("pokedex-moves",
+                                                    $pokedex[$_SESSION['pokedexIndex']]['name'], "'s moves",
+                                                    part("h",
+                                                        p("pokedex-type", $pokedex[$_SESSION['pokedexIndex']]['move1']),
+                                                        p("pokedex-type", $pokedex[$_SESSION['pokedexIndex']]['move2']),
+                                                        p("pokedex-type", $pokedex[$_SESSION['pokedexIndex']]['move3']),
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        div("pokedex-screen-buttons",
+                                            div("pokedex-screen-button"),
+                                            div("pokedex-speaker",
+                                                "<hr>", "<hr>", "<hr>", "<hr>",
+                                            )
+                                        )
+                                    ),
+                                    div("pokedex-buttons",
+                                        button("decrement_pokedex", "pokedex-button", "<"),
+                                        div("pokedex-button-group",
+                                            div("pokedex-line-buttons",
+                                                div("pokedex-line-button red"),
+                                                div("pokedex-line-button blue"),
+                                            ),
+                                            div("pokedex-trackpad")
+                                        ),
+                                        button("increment_pokedex", "pokedex-button", ">", ["limit" => count($pokedex) - 1])
+                                    )
+                                )
+                            ),
+                            card("icon_pokeball.png", "BATTLES", 
+                                function() use($db) {
+                                    $html = '';
+                                    $joins = [
+                                        ['tblTrainerAccount t1', 'b.firstOpponent = t1.trainerAccountID'],
+                                        ['tblTrainerAccount t2', 'b.secondOpponent = t2.trainerAccountID']
+                                    ];
+                                    $battles = $db->select('tblBattle b', 'b.*, t1.firstname AS firstOpponentName, t2.firstname AS secondOpponentName', '', $joins);
+                                    foreach ($battles as $battle) {
+                                        $winner = ($battle['isFirstOpponentWinner']) ? $battle['firstOpponentName'] : $battle['secondOpponentName'];
+                                        $html .= card("icon_pokeball.png", $battle['firstOpponentName'] . " vs. " . $battle['secondOpponentName'],
+                                            p("dex-moves","Battle date: ", $battle['battleDate']),
+                                            p("battle-winner", $winner, " won this battle!")
+                                        );
+                                    }
+                                    return $html;
+                                }
+                            )
                         )
                     )
-                ),
-                // card("icon_pokeball.png", "POKEDEX", function() use($db) {
-                //     $html = '';
-                //     $pokedex = $db->select("tblPokedex", "*");
-                //     foreach ($pokedex as $dex) {
-                //         $dex['move1'] .= ", " . $dex['move2'] .= ", " . $dex['move3'];
-                //         if ($dex['type2'] != 'None') {
-                //             $dex['type1'] .= ", " . $dex['type2'];
-                //         }
-                //         $html .= card("icon_pokeball.png", $dex['name'], '
-                //             <p class="dex-types">Types: '. $dex['type1'] . '</p>
-                //             <p class="dex-moves">Moves: '. $dex['move1'] .'</p>
-                //             <p class="dex-desc">'. $dex['description'] .'</p>
-                //         ');
-                //     }
-                //     return $html;
-                // }) .
-                card("icon_pokeball.png", "BATTLES", function() use($db) {
-                    // $html = '';
-                    // $battles = $db->select('tblBattle', '*');
-                    // foreach ($battles as $battle) {
-                    //     $opp1Name = $db->select('tblTrainerAccount', '*', "trainerAccountID='". $battle['firstOpponent'] ."'")['0']['firstname'];
-                    //     $opp2Name = $db->select('tblTrainerAccount', '*', "trainerAccountID='". $battle['secondOpponent'] ."'")['0']['firstname'];
-                    //     $winner = ($battle['isFirstOpponentWinner']) ? $opp1Name : $opp2Name;
-                    //     $html .= card("icon_pokeball.png", $opp1Name . " vs. " . $opp2Name, '
-                    //         <p class="dex-moves"> Battle date: '. $battle['battleDate'] .'</p>
-                    //         <p class="battle-winner">'. $winner . ' won this battle! </p>
-                    //     ');
-                    // }
-                    // return $html;
-                })
-            )
-        );
-        ?>
+                )
+            ?>
         </main>
         
         <footer>
@@ -211,6 +250,8 @@ require 'php/connect.php';
         </footer>
     </section>
 
-    <script src="js/shared.js"></script>
+    <script src="js/shared.js">
+
+    </script>
 </body>
 </html>

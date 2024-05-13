@@ -14,26 +14,26 @@ class Database {
         return mysqli_query($this->conn, $sql);
     }
 
-    public function select($table, $columns = '*', $where = '') {
+    public function select($table, $columns = '*', $where = '', $joins = []) {
         $sql = "SELECT $columns FROM $table";
+        foreach ($joins as $join) {
+            $sql .= " JOIN $join[0] ON $join[1]";
+        }
         if (!empty($where)) {
             $sql .= " WHERE $where";
         }
         $result = $this->query($sql);
-    
         if (!$result) {
             return [];
         }
-    
         $rows = [];
         while ($row = mysqli_fetch_assoc($result)) {
             $rows[] = $row;
         }
-    
         mysqli_free_result($result);
-    
         return $rows;
     }
+    
 
     public function select2($selectQuery) {
         $sql = $selectQuery;
@@ -173,14 +173,20 @@ function part($orientation) {
 function div($class) {
     $args = func_get_args();
     $contents = "";
+    $id = "";
     array_shift($args);
     foreach ($args as $content) {
+        if (str_starts_with($content, "#")) {
+            $content = substr($content, 1);
+            $id = $content;
+            continue;
+        }
         if (is_callable($content)) {
             $content = $content();
         }
         $contents .= $content;
     }
-    return '<div class="' . $class . '">'. $contents .'</div>';
+    return '<div id="'. $id .'" class="' . $class . '">'. $contents .'</div>';
 }
 
 function p($class) {
@@ -194,6 +200,35 @@ function p($class) {
         $contents .= $content;
     }
     return '<p class="' . $class . '">'. $contents .'</p>';
+}
+
+function img($src) {
+    $args = func_get_args();
+    $classes = "";
+    array_shift($args);
+    foreach ($args as $arg) {
+        $classes .= $arg;
+    }
+    return '<img class="'. $classes .'" src="'. $src .'">';
+}
+
+function button($action, $class, $content) {
+    $args = func_get_args();
+    $values = "";
+    array_shift($args);
+    array_shift($args);
+    array_shift($args);
+    foreach ($args as $arg) {
+        if (is_array($arg) && count($arg) == 1 && is_string(key($arg))) {
+            $values .= '<input type="hidden" name="'. key($arg) .'" value="'. reset($arg) .'">';
+        }
+    }
+    return '
+    <form action="'. $action .'.php" method="post">
+        '. $values .'
+        <button class="'. $class .'" name="'. $action .'" type="submit">'. $content .'</button>
+    </form>
+    ';
 }
 
 ?>

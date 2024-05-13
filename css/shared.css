@@ -113,6 +113,7 @@ main {
     border: var(--outline);
     padding: 4px;
     box-shadow: var(--shadow);
+    max-height: 500px;
 }
 
 .card-header {
@@ -129,6 +130,7 @@ main {
 }
 
 .card-title {
+    text-transform: uppercase;
     width: 100%;
     padding: 3px 6px;
     background-color: var(--primary);
@@ -144,8 +146,8 @@ main {
     background-color: var(--primary-light);
     border: var(--outline);
     box-shadow: var(--deshadow-deboss);
-    max-height: 400px;
     overflow-y: scroll;
+    gap: 6px;
 }
 
 .card-txt {
@@ -239,13 +241,6 @@ header, footer {
     box-shadow: var(--shadow-emboss);
 }
 
-#pokedex {
-    display: grid;
-    grid-template-columns: 1fr;
-    width: 100%;
-    gap: 8px;
-}
-
 .dex-moves {
     margin-top: -2px;
     font-size: 14px;
@@ -327,12 +322,12 @@ header, footer {
 }
 
 .pokedex {
+    flex: 1;
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow);
     overflow: hidden;
     border-radius: 5px;
-    flex: 1;
 }
 
 .pokedex-top, .pokedex-bottom {
@@ -351,6 +346,7 @@ header, footer {
 }
 
 .pokedex-bottom {
+    flex: 1;
     flex-direction: column;
     gap: 8px;
     box-shadow: var(--shadow-halfdark-emboss);
@@ -363,12 +359,12 @@ header, footer {
 .pokedex-top-left {
     display: flex;
     align-items: flex-start;
-    padding: 8px;
-    padding-right: 16px;
+    padding: 8px 16px;
+    padding-right: 24px;
     gap: 4px;
     border-right: var(--outline);
     border-bottom: var(--outline);
-    box-shadow: var(--shadow-emboss);
+    box-shadow: var(--shadow-halfdark-emboss);
     border-bottom-right-radius: 60px;
 }
 
@@ -378,6 +374,8 @@ header, footer {
     flex-direction: column;
     margin-left: -10px;
     gap: 4px;
+    border-radius: 5px;
+    overflow: hidden;
 }
 
 .pokedex-top-right-box {
@@ -435,7 +433,7 @@ header, footer {
 
 .pokedex-screen-content {
     display: flex;
-    background-color: var(--dark-gray);
+    background-color: var(--black);
     padding: 8px;
     border: var(--outline);
     box-shadow: var(--deshadow-deboss);
@@ -445,6 +443,7 @@ header, footer {
 .pokedex-screen-buttons {
     display: flex;
     justify-content: space-between;
+    align-self: center;
     width: 100%;
     gap: 12px;
 }
@@ -455,13 +454,14 @@ header, footer {
     border: var(--outline);
     box-shadow: var(--shadow-emboss);
     border-radius: 32px;
-    height: 100%;
+    padding: 12px;
     cursor: pointer;
 }
 
 .pokedex-speaker {
     display: flex;
     flex-direction: column;
+    align-self: center;
     gap: 4px;
     width: 100%;
     max-width: 50px;
@@ -514,4 +514,95 @@ header, footer {
     box-shadow: var(--deshadow-deboss);
     height: 50px;
     border-radius: 5px;
+}
+
+.pokedex-result {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    background-color: white;
+}
+
+.pokedex-header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px;
+    padding-left: 12px;
+    background-color: var(--primary);
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+}
+
+.pokedex-name {
+    font-size: 20px;
+}
+
+.pokedex-type {
+    background-color: var(--primary-light);
+    padding: 3px 6px;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+}
+
+.pokedex-body {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    margin-top: -2px;
+}
+
+.pokedex-description {
+    flex: 1;
+    background-color: var(--secondary);
+    padding: 3px 6px;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+}
+
+.pokedex-moves {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: var(--primary);
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    margin-top: -2px;
+    padding: 6px;
+    gap: 6px;
+}
+
+.pokedex-image {
+    height: 100px;
+}
+
+.non-flex {
+    flex: initial;
+    flex-wrap: initial;
+    width: initial;
+    gap: initial;
+}
+
+.pokemon-record {
+    display: flex;
+    flex: 1;
+}
+
+.add-to-team-button, .free-button {
+    background-color: var(--primary);
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    padding: 3px 6px;
+    height: 100%;
+}
+
+.pokemon-name {
+    flex: 1;
+    background-color: var(--secondary);
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    padding: 3px 6px;
 }

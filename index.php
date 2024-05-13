@@ -124,27 +124,18 @@ if (!isset($_SESSION['pokedexIndex'])) {
                             )
                         ),
                         card("icon_pokeball.png", "DASHBOARD",
-                            card("icon_pokeball.png", "NUMBER OF BATTLES",
-                                function() use($db, $currentUser) {
-                                    $sql = "SELECT COUNT(isFirstOpponentWinner) as numOfBattles FROM tblBattle WHERE firstOpponent='$currentUser' OR secondOpponent='$currentUser'";
-                                    $numOfBattles = $db->select2($sql);
-                                    $numOfBattles = $numOfBattles[0]['numOfBattles'];
-                                    $_SESSION['numOfBattles'] = $numOfBattles;
-                                    return $numOfBattles;
-                                }
-                            ),
-                            card("icon_pokeball.png", "WIN RATE",
-                                function() use($db, $currentUser) {
-                                    $numOfWins = $db->select("tblBattle", "SUM(CASE WHEN isFirstOpponentWinner = 1 AND firstOpponent = '$currentUser' THEN 1 ELSE 0 END) AS numOfWins1,
-                                    SUM(CASE WHEN isFirstOpponentWinner = 0 AND secondOpponent = '$currentUser' THEN 1 ELSE 0 END) AS numOfWins2", "(firstOpponent = '$currentUser' AND isFirstOpponentWinner = 1) OR (secondOpponent = '$currentUser' AND isFirstOpponentWinner = 0)");
-                                    $numOfWins1 = $numOfWins[0]['numOfWins1'];
-                                    $numOfWins2 = $numOfWins[0]['numOfWins2'];
-                                    $totalWins = $numOfWins1 + $numOfWins2;
-                                    $winRate = $_SESSION['numOfBattles'] > 0 ? ($totalWins / $_SESSION['numOfBattles']) * 100 : 0;
-                                    $_SESSION['winRate'] = $winRate;
-                                    return $winRate . "%";
-                                }
-                            )
+                            function() use($db, $currentUser) {
+                                $data = $db->select("tblBattle", "COUNT(battleID) AS totalBattles, 
+                                SUM(CASE WHEN (isFirstOpponentWinner=1 AND firstOpponent='$currentUser') OR 
+                                (isFirstOpponentWinner=0 AND secondOpponent='$currentUser') THEN 1 ELSE 0 END) AS totalWins", 
+                                "firstOpponent='$currentUser' OR secondOpponent='$currentUser'")[0];
+
+                                $numOfBattles = $data["totalBattles"];
+                                $numOfWins = $data["totalWins"];
+
+                                return
+                                pieChart(['Total battles: ' => $numOfBattles],  ['Wins' => $numOfWins], ['Losses' => $numOfBattles - $numOfWins]);
+                            }
                         )
                     ) : "",
                     part('v',

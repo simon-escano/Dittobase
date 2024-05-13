@@ -219,7 +219,7 @@ function button($action, $class, $content) {
     array_shift($args);
     array_shift($args);
     foreach ($args as $arg) {
-        if (is_array($arg) && count($arg) == 1 && is_string(key($arg))) {
+        if (is_single_assoc_array($arg)) {
             $values .= '<input type="hidden" name="'. key($arg) .'" value="'. reset($arg) .'">';
         }
     }
@@ -229,6 +229,60 @@ function button($action, $class, $content) {
         <button class="'. $class .'" name="'. $action .'" type="submit">'. $content .'</button>
     </form>
     ';
+}
+
+function pieChart($total) {
+    $args = func_get_args();
+    array_shift($args);
+    $headers = "";
+    $values = "";
+    $colors = ["var(--secondary)", "var(--secondary-verylight)", "var(--primary)"];
+    $totalColor = "var(--primary-dark) ";
+
+    $headers .= div("pie-chart-header",
+        '<div class="pie-chart-header-percent" style="background: '. $totalColor .'">'. key($total) . ': ' . reset($total) . '</div>'
+    );
+
+    $sum = 0;
+    for ($i = 0; $i < count($args); $i++) {
+        $arg = $args[$i];
+        if (is_single_assoc_array($arg)) {
+            $total_num = reset($total);
+            $name = key($arg);
+            $value = reset($arg);
+            $prev = $i != 0 ? reset($args[$i - 1]) : 0;
+            $color = $colors[$i % count($colors)] . " ";
+            $headers .= 
+            div("pie-chart-header",
+                '<div class="pie-chart-header-percent" style="background: '. $color .'">'. percent($total_num, $value, true) .'</div>',
+                p("pie-chart-header-text", $name . ": " . $value)
+            );
+            $values .= $color . $sum . "% " . $sum + percent($total_num, $value) . "%, ";
+            $sum += percent($total_num, $value);
+            if ($i == count($args) - 1) {
+                $values .= $totalColor . $sum . "% ";
+            }
+        }
+    }
+
+    
+    return 
+    div("pie-chart-container",
+        div("pie-chart-headers", $headers),
+        '<div class="pie-chart" style="background: conic-gradient('. $values .');"></div>'
+    );
+}
+
+function is_single_assoc_array($array) {
+    return is_array($array) && count($array) == 1 && is_string(key($array));
+}
+
+function percent($total, $value, $string = false) {
+    $percent = ($value / $total) * 100;
+    if ($string) {
+        $percent = intval($percent) . "%";
+    }
+    return $percent;
 }
 
 ?>

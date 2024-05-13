@@ -1,7 +1,10 @@
 <?php
 require 'php/connect.php';
 
-if ($currentUser) session_destroy();
+if ($currentUser) {
+    session_destroy();
+    $_SESSION = [];
+}
 $userAccounts = $db->select('tblUserAccount', '*');
 
 ?>

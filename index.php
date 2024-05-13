@@ -147,8 +147,8 @@ if (!isset($_SESSION['pokedexIndex'])) {
                                     foreach ($arenas as $arena) {
                                         $html .=
                                         div("arena",
-                                            p("", "Located in ", $arena['region']),
                                             p("arena-name", $arena['name']),
+                                            p("", "Located in ", $arena['region']),
                                             div("arena-description",
                                                 p("arena-description-text", "Fight in ", $arena['name'], " to get <span>", $arena['badge'], "!</span>")
                                             )

@@ -196,7 +196,7 @@ if (!isset($_SESSION['pokedexIndex'])) {
                                     )
                                 )
                             ),
-                            div("line-chart", "#chartContainer", "*height: 370px; width: 100%;")
+                            div("line-chart", "#chartContainer", "*height: 140px; width: 100%;")
                         )
                     ) : "",
                     part('v',
@@ -326,39 +326,53 @@ if (!isset($_SESSION['pokedexIndex'])) {
     <script>
     window.onload = function () {
         var chart = new CanvasJS.Chart("chartContainer", {
-        title: {
-            text: "Win Trajectory",
-            fontFamily: "Pixelify Sans",
-            fontColor: "#FFF",
-            fontSize: 24
-        },
-        axisY: {
-            fontFamily: "Pixelify Sans",
-            labelFontFamily: "Pixelify Sans",
-            labelFontColor: "#FFF",
-            fontColor: "#FFF",
-            fontWeight: "bold",
-            labelFontSize: 18,
-            interval: 1,
-            minimum: 0,
-            maximum: 1
-        },
-        axisX: {
-            labelFontFamily: "Pixelify Sans",
-            labelFontColor: "#FFF",
-            labelFontSize: 10,
-            fontWeight: "bold"
-        },
-        data: [{
-            type: "line",
-            dataPoints: <?php echo json_encode($dataPoints, JSON_NUMERIC_CHECK); ?>,
-            lineColor: "#7d18de",
-            markerColor: "#f856ab"
-        }],
-        backgroundColor: "#39135c"
-    });
-    chart.render();
-    
+            title: {
+                text: "Win Trajectory",
+                fontFamily: "Pixelify Sans",
+                fontWeight: "bold",
+                fontColor: "#39135c",
+                fontSize: 24
+            },
+            axisY: {
+                fontFamily: "Pixelify Sans",
+                labelFontFamily: "Pixelify Sans",
+                labelFontColor: "#39135c",
+                fontColor: "#39135c",
+                fontWeight: "bold",
+                labelFontSize: 12,
+                interval: 1,
+                minimum: 0,
+                maximum: 1,
+                labelFormatter: function (e) {
+                    return (e.value === 1) ? "Win" : "Loss";
+                }
+            },
+            axisX: {
+                labelFontFamily: "Pixelify Sans",
+                labelFontColor: "#39135c",
+                labelFontSize: 10,
+                fontWeight: "bold"
+            },
+            data: [{
+                type: "line",
+                dataPoints: <?php echo json_encode($dataPoints, JSON_NUMERIC_CHECK); ?>,
+                lineColor: "#7d18de",
+                markerColor: "#f856ab"
+            }],
+            backgroundColor: "#FFF",
+            toolTip: {
+                contentFormatter: function (e) {
+                    var content = " ";
+                    if (e.entries[0].dataPoint.y == 1) {
+                        content += `<span style='color: #ffacd7; font-weight: bold;'>Won</span>`;
+                    } else {
+                        content += `<span style='color: #a977d8; font-weight: bold;'>Lost</span>`;
+                    }
+                    return content;
+                }
+            }
+        });
+        chart.render();
     }
     </script>
     <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>

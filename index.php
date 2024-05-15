@@ -155,7 +155,7 @@ if (!isset($_SESSION['pokedexIndex'])) {
                                     p("bar-chart-title", "Your pokemon types")
                                 ),
                                 function() use($db, $currentUser) {
-                                    $types = getPokemonTypes($db, "trainerAccountID=$currentUser");
+                                    $types = getPokemonTypes($db, "TA.trainerAccountID=$currentUser");
                                 }
                             )
                         )

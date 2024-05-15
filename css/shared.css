@@ -922,3 +922,8 @@ header, footer {
 .flex-column {
     flex-direction: column;
 }
+
+.line-chart {
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+}

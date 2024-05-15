@@ -3,6 +3,15 @@ require 'php/connect.php';
 
 $pokedex = $db->select("tblPokedex", "name, type1, type2, move1, move2, move3, description, image");
 
+$battleDetails = $db->select("tblBattle", "isFirstOpponentWinner, battleDate", "firstOpponent = $currentUser OR secondOpponent = $currentUser ORDER BY battleDate");
+$dataPoints = array();
+foreach ($battleDetails as $bd) {
+    $dataPoints[] = array(
+        "y" => $bd['isFirstOpponentWinner'],
+        "label" => $bd['battleDate']
+    );
+}
+
 if (!isset($_SESSION['pokedexIndex'])) {
     $_SESSION['pokedexIndex'] = 0;
 }
@@ -92,14 +101,13 @@ if (!isset($_SESSION['pokedexIndex'])) {
                                                                     
                                 )
                             ),
-                            card("icon_pokeball.png", "YOUR POKEMON",
+                            card("icon_pokeball.png", "YOUR POKEMON (" . countPokemon($db, $currentUser) . ")",
                                 div("pokemons", "#your-pokemon",
                                     function() use($db, $currentUser) {
                                         $html = '';
                                         $trainerPokemon = $db->select('tblTrainerPokemon', '*', "trainerAccountID='" . $currentUser . "'");
                                         if ($trainerPokemon) {
                                             $trainerPokemon = $trainerPokemon[0];
-
                                             $joins = [
                                                 ['tblPokemon p', 'p.spawnID = t.pokemon1 OR p.spawnID = t.pokemon2 OR p.spawnID = t.pokemon3 OR p.spawnID = t.pokemon4 OR p.spawnID = t.pokemon5 OR p.spawnID = t.pokemon6 OR p.spawnID = t.pokemon7 OR p.spawnID = t.pokemon8 OR p.spawnID = t.pokemon9 OR p.spawnID = t.pokemon10'],
                                                 ['tblPokedex d', 'd.pokedexID = p.pokedexID']
@@ -137,56 +145,58 @@ if (!isset($_SESSION['pokedexIndex'])) {
                             )
                         ),
                         card("icon_pokeball.png", "DASHBOARD",
-                            function() use($db, $currentUser) {
-                                $data = $db->select("tblBattle", "COUNT(battleID) AS totalBattles, 
-                                SUM(CASE WHEN (isFirstOpponentWinner=1 AND firstOpponent='$currentUser') OR 
-                                (isFirstOpponentWinner=0 AND secondOpponent='$currentUser') THEN 1 ELSE 0 END) AS totalWins", 
-                                "firstOpponent='$currentUser' OR secondOpponent='$currentUser'")[0];
+                            part('h',
+                                function() use($db, $currentUser) {
+                                    $data = $db->select("tblBattle", "COUNT(battleID) AS totalBattles, 
+                                    SUM(CASE WHEN (isFirstOpponentWinner=1 AND firstOpponent='$currentUser') OR 
+                                    (isFirstOpponentWinner=0 AND secondOpponent='$currentUser') THEN 1 ELSE 0 END) AS totalWins", 
+                                    "firstOpponent='$currentUser' OR secondOpponent='$currentUser'")[0];
 
-                                $numOfBattles = $data["totalBattles"];
-                                $numOfWins = $data["totalWins"];
+                                    $numOfBattles = $data["totalBattles"];
+                                    $numOfWins = $data["totalWins"];
 
-                                return
-                                pieChart(['Total battles' => $numOfBattles],  ['Wins' => $numOfWins], ['Losses' => $numOfBattles - $numOfWins]);
-                            },
-                            div("bar-chart flex-1",
-                                div("bar-chart-header",
-                                    p("bar-chart-title", "Your pokemon types"),
-                                    div("bar-chart-legends",
-                                        function() {
-                                            $html = "";
-                                            $types = getTypes();
-                                            foreach ($types as $key => $value) {
-                                                $html .=
-                                                div("bar-chart-legend",
-                                                    barChartLegend($key, $value)
-                                                );
-                                            }
+                                    return
+                                    pieChart(['Total battles' => $numOfBattles],  ['Wins' => $numOfWins], ['Losses' => $numOfBattles - $numOfWins]);
+                                },
+                                div("bar-chart flex-1",
+                                    div("bar-chart-header",
+                                        p("bar-chart-title", "YOUR POKEMON TYPES"),
+                                        div("bar-chart-legends",
+                                            function() {
+                                                $html = "";
+                                                $types = getTypes();
+                                                foreach ($types as $key => $value) {
+                                                    $html .=
+                                                    div("bar-chart-legend",
+                                                        barChartLegend($key, $value)
+                                                    );
+                                                }
 
-                                            return $html;
-                                        },
-                                        div ("bar-chart-legend",
+                                                return $html;
+                                            },
+                                            div ("bar-chart-legend",
+                                            )
                                         )
-                                    )
-                                ),
-                                div("bar-chart-elems",
-                                    function() use($db, $currentUser) {
-                                        $html = "";
-                                        $types = getPokemonTypes($db, "TA.trainerAccountID=$currentUser");
-                                        $typeCount = typeCounter($types[0]);
-                                        $typeColors = getTypes();
-                                        $total = $typeCount["total"];
+                                    ),
+                                    div("bar-chart-elems",
+                                        function() use($db, $currentUser) {
+                                            $html = "";
+                                            $types = getPokemonTypes($db, "TA.trainerAccountID=$currentUser");
+                                            $typeCount = typeCounter($types[0]);
+                                            $typeColors = getTypes();
+                                            $total = $typeCount["total"];
 
-                                        foreach ($typeCount as $type => $value) {
-                                            if (!$value || $type == "total") continue;
-                                            $html .= barChartElem(percent($total, $value, true), $typeColors[$type], p("bar-chart-elem-amount", $value));
+                                            foreach ($typeCount as $type => $value) {
+                                                if (!$value || $type == "total") continue;
+                                                $html .= barChartElem(percent($total, $value, true), $typeColors[$type], p("bar-chart-elem-amount", $value));
+                                            }
+                                            
+                                            return $html;
                                         }
-                                        
-                                        return $html;
-                                    }
+                                    )
                                 )
                             ),
-                            "#dashboard",
+                            div("line-chart", "#chartContainer", "*height: 370px; width: 100%;")
                         )
                     ) : "",
                     part('v',
@@ -312,8 +322,45 @@ if (!isset($_SESSION['pokedexIndex'])) {
         </footer>
     </section>
 
-    <script src="js/shared.js">
-
+    <script src="js/shared.js"></script>
+    <script>
+    window.onload = function () {
+        var chart = new CanvasJS.Chart("chartContainer", {
+        title: {
+            text: "Win Trajectory",
+            fontFamily: "Pixelify Sans",
+            fontColor: "#FFF",
+            fontSize: 24
+        },
+        axisY: {
+            fontFamily: "Pixelify Sans",
+            labelFontFamily: "Pixelify Sans",
+            labelFontColor: "#FFF",
+            fontColor: "#FFF",
+            fontWeight: "bold",
+            labelFontSize: 18,
+            interval: 1,
+            minimum: 0,
+            maximum: 1
+        },
+        axisX: {
+            labelFontFamily: "Pixelify Sans",
+            labelFontColor: "#FFF",
+            labelFontSize: 10,
+            fontWeight: "bold"
+        },
+        data: [{
+            type: "line",
+            dataPoints: <?php echo json_encode($dataPoints, JSON_NUMERIC_CHECK); ?>,
+            lineColor: "#7d18de",
+            markerColor: "#f856ab"
+        }],
+        backgroundColor: "#39135c"
+    });
+    chart.render();
+    
+    }
     </script>
+    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 </body>
 </html>

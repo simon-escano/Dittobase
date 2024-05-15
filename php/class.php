@@ -164,6 +164,7 @@ function div($class) {
     $args = func_get_args();
     $contents = "";
     $id = "";
+    $style = "";
     array_shift($args);
     foreach ($args as $content) {
         if (is_callable($content)) {
@@ -174,9 +175,14 @@ function div($class) {
             $id = $content;
             continue;
         }
+        if (str_starts_with($content, "*")) {
+            $content = substr($content, 1);
+            $style = $content;
+            continue;
+        }
         $contents .= $content;
     }
-    return '<div id="'. $id .'" class="' . $class . '">'. $contents .'</div>';
+    return '<div id="'. $id .'" class="' . $class . '" style="'. $style .'">'. $contents .'</div>';
 }
 
 function p($class) {
@@ -466,6 +472,47 @@ function barChartLegend($name, $color) {
     <div class='bar-chart-legend-color'
         style='background-color: ". $color ."'
     ></div>" . p("bar-chart-legend-title", $name);
+}
+
+function countPokemon($db, $trainerID) {
+    $sql = "SELECT 
+            SUM(count_pokemon1) AS total_count_pokemon1,
+            SUM(count_pokemon2) AS total_count_pokemon2,
+            SUM(count_pokemon3) AS total_count_pokemon3,
+            SUM(count_pokemon4) AS total_count_pokemon4,
+            SUM(count_pokemon5) AS total_count_pokemon5,
+            SUM(count_pokemon6) AS total_count_pokemon6,
+            SUM(count_pokemon7) AS total_count_pokemon7,
+            SUM(count_pokemon8) AS total_count_pokemon8,
+            SUM(count_pokemon9) AS total_count_pokemon9,
+            SUM(count_pokemon10) AS total_count_pokemon10,
+            SUM(count_pokemon1 + count_pokemon2 + count_pokemon3 + count_pokemon4 + count_pokemon5 + count_pokemon6 + count_pokemon7 + count_pokemon8 + count_pokemon9 + count_pokemon10) AS total_count
+        FROM (
+            SELECT 
+                COUNT(CASE WHEN pokemon1 IS NOT NULL AND pokemon1 != 0 THEN 1 END) AS count_pokemon1,
+                COUNT(CASE WHEN pokemon2 IS NOT NULL AND pokemon2 != 0 THEN 1 END) AS count_pokemon2,
+                COUNT(CASE WHEN pokemon3 IS NOT NULL AND pokemon3 != 0 THEN 1 END) AS count_pokemon3,
+                COUNT(CASE WHEN pokemon4 IS NOT NULL AND pokemon4 != 0 THEN 1 END) AS count_pokemon4,
+                COUNT(CASE WHEN pokemon5 IS NOT NULL AND pokemon5 != 0 THEN 1 END) AS count_pokemon5,
+                COUNT(CASE WHEN pokemon6 IS NOT NULL AND pokemon6 != 0 THEN 1 END) AS count_pokemon6,
+                COUNT(CASE WHEN pokemon7 IS NOT NULL AND pokemon7 != 0 THEN 1 END) AS count_pokemon7,
+                COUNT(CASE WHEN pokemon8 IS NOT NULL AND pokemon8 != 0 THEN 1 END) AS count_pokemon8,
+                COUNT(CASE WHEN pokemon9 IS NOT NULL AND pokemon9 != 0 THEN 1 END) AS count_pokemon9,
+                COUNT(CASE WHEN pokemon10 IS NOT NULL AND pokemon10 != 0 THEN 1 END) AS count_pokemon10
+            FROM tblTrainerPokemon
+            WHERE trainerAccountID ='$trainerID'
+        ) AS counts;";
+
+    $result = $db->query($sql);
+    if (!$result) {
+        return [];
+    }
+    $rows = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $rows[] = $row;
+    }
+    mysqli_free_result($result);
+    return $rows[0]['total_count'];
 }
 
 ?>

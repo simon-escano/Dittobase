@@ -1,7 +1,6 @@
 <?php
 require 'php/connect.php';
-global $currentUser;
-global $db;
+require "php/html_generator.php";
 ?>
 
 <!DOCTYPE html>
@@ -10,7 +9,7 @@ global $db;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DittoBase | Admin</title>
-
+    
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,167 +17,166 @@ global $db;
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/root.css">
     <link rel="stylesheet" href="css/shared.css">
-
-    <style>
-        main {
-            flex-direction: column;
-        }
-        form {
-            display: flex;
-            flex-direction: row;
-
-            > input {
-                overflow: initial;
-                text-overflow: initial;
-                max-width: initial;
-            }
-        }
-    </style>
 </head>
 <body>
-    <section id="container">
-        <header>DittoBase</header>
-
-        <section id="banner">
-            <img id="banner-img" src="img/banner_home.png">
-        </section>
-    
-        <nav>
-            <?php
-                if (!$currentUser) {
-                    echo '<button id="register" class="nav-button">REGISTER <span>▶</span></button>';
-                    echo '<button id="login" class="nav-button">LOGIN <span>▶</span></button>';
-                } else {
-                    echo '<button id="login" class="nav-button">LOGOUT <span>▶</span></button>';
-                }
-
-                if ($currentUser == 45) {
-                    echo '<button id="admin" class="nav-button">ADMIN <span>▶</span></button>';
-                }
-            ?>
-            <button id="home" class="nav-button">HOME <span>▶</span></button>
-            <button id="about-us" class="nav-button">ABOUT US <span>▶</span></button>
-            <button id="contact-us" class="nav-button">CONTACT US <span>▶</span></button>
-        </nav>
-
-        <main>
-            <form action="" method="post">
-                <div class="form-input">
-                    <label for="region">Region</label>
-                    <select id="region" name="region">
-                        <option value="Kanto">Kanto</option>
-                        <option value="Johto">Johto</option>
-                        <option value="Hoenn">Hoenn</option>
-                        <option value="Sinnoh">Sinnoh</option>
-                        <option value="Unova">Unova</option>
-                        <option value="Kalos">Kalos</option>
-                        <option value="Alola">Alola</option>
-                        <option value="Galar">Galar</option>
-                    </select>
-                </div>
-                <input class="submit-button" id="register-button" name="" type="submit" value="Display Trainers">
-            </form>
-            <?php
-            if (isset($_POST['region'])) {
-                echo part('h', card('icon_pokeball.png', "Trainers from " . $_POST['region'], function() use($db) {
-                    $html = '';
-                    $kantoTrainers = $db->select('tblUser', 'username', 'region="' . $_POST['region'] . '"');
-                    //SELECT tblUser username where region = '[user input]'
-                    foreach ($kantoTrainers as $kantoTrainer) {
-                        $html .= '<p>' . $kantoTrainer['username'] . '</p>';
-                    }
-                    return $html;
-                }));
+<?php
+echo section("#container",
+    head("Dittobase"),
+    section("#banner",
+        img("img/banner_home.png", "#banner-img")
+    ),
+    nav(
+        function() {
+            global $currentUser;
+            $html = new HTML();
+            if (!$currentUser) {
+                $html->add(
+                    button(null, "#register", ".nav-button", "REGISTER", span("▶")),
+                    button(null, "#login", ".nav-button", "LOGIN", span("▶")),
+                );
+            } else {
+                $html->add(
+                    button(null, "#login", ".nav-button", "LOGOUT", span("▶"))
+                );
             }
-            ?>
-            <form action="" method="post">
-                <div class="form-input">
-                    <label for="type">Pokemon Type</label>
-                    <select id="type" name="type">
-                        <option value="Normal">Normal</option>
-                        <option value="Fire">Fire</option>
-                        <option value="Water">Water</option>
-                        <option value="Electric">Electric</option>
-                        <option value="Grass">Grass</option>
-                        <option value="Ice">Ice</option>
-                        <option value="Fighting">Fighting</option>
-                        <option value="Poison">Poison</option>
-                        <option value="Ground">Ground</option>
-                        <option value="Flying">Flying</option>
-                        <option value="Psychic">Psychic</option>
-                        <option value="Bug">Bug</option>
-                        <option value="Rock">Rock</option>
-                        <option value="Ghost">Ghost</option>
-                        <option value="Dragon">Dragon</option>
-                        <option value="Dark">Dark</option>
-                        <option value="Steel">Steel</option>
-                        <option value="Fairy">Fairy</option>
-                    </select>
-                </div>
-                <input class="submit-button" id="register-button" name="" type="submit" value="Display Trainer Types">
-            </form>
-            <?php
-            if (isset($_POST['type'])) {
-                echo part('h', card('icon_pokeball.png', $_POST['type'] . "-type Trainers", 
-                    function() use($db) {
-                        $html = '';
-                        $trainerTypeInput = $_POST['type'];
-                        $trainers = getPokemonTypes($db);
-                        print_r($trainers);
-
-                        foreach ($trainers as $trainer) {
-                            if($trainer['type11'] == $trainerTypeInput || $trainer['type21'] == $trainerTypeInput || $trainer['type12'] == $trainerTypeInput ||
-                                $trainer['type22'] == $trainerTypeInput || $trainer['type13'] == $trainerTypeInput || $trainer['type23'] == $trainerTypeInput ||
-                                $trainer['type14'] == $trainerTypeInput || $trainer['type24'] == $trainerTypeInput || $trainer['type15'] == $trainerTypeInput ||
-                                $trainer['type25'] == $trainerTypeInput || $trainer['type16'] == $trainerTypeInput || $trainer['type26'] == $trainerTypeInput ||
-                                $trainer['type17'] == $trainerTypeInput || $trainer['type27'] == $trainerTypeInput || $trainer['type18'] == $trainerTypeInput ||
-                                $trainer['type28'] == $trainerTypeInput || $trainer['type19'] == $trainerTypeInput || $trainer['type29'] == $trainerTypeInput ||
-                                $trainer['type110'] == $trainerTypeInput || $trainer['type210'] == $trainerTypeInput)
-                            $html .= '<p>' . $trainer['trainerName'] . '</p>';
-                        }
+            if ($currentUser == 45) {
+                $html->add(
+                    button(null, "#admin", ".nav-button", "ADMIN", span("▶"))
+                );
+            }
+            return $html;
+        },
+        button(null, "#home", ".nav-button", "HOME", span("▶")),
+        button(null, "#about-us", ".nav-button", "ABOUT US", span("▶")),
+        button(null, "#contact-us", ".nav-button", "CONTACT US", span("▶"))
+    ),
+    main(
+        vbox(
+            card("icon_pokeball.png", "Region Report",
+                form(null, ".flex-row",
+                    div(".form-input",
+                        label("region", "Region"),
+                        select("region", "Kanto", "Johto", "Hoenn", "Sinnoh", "Unova", "Kalos", "Alola", "Galar")
+                    ),
+                    button(null, ".report-button", "GO!")
+                ),
+                function() {
+                    if (isset($_POST['region'])) {
+                        $html = new HTML();
+                        $html->add(
+                            card("icon_pokeball.png", "Trainers from " . $_POST['region'],
+                                function() {
+                                    global $db;
+                                    $html = new HTML();
+                                    $kantoTrainers = $db->select('tblUser', 'username', 'region="' . $_POST['region'] . '"');
+                                    foreach ($kantoTrainers as $kantoTrainer) {
+                                        $html->add(p($kantoTrainer['username']));
+                                    }
+                                    return $html;
+                                }
+                            )
+                        );
                         return $html;
                     }
-                ));
-            }
-            ?>
-            <form action="" method="post">
-                <input type="hidden" name="check-arena-status" value="check-arena-status">
-                <input class="submit-button" id="check-arena-status-button" name="check-arena-status-button" type="submit" value="Check Arena Status">
-            </form>
-            <?php
-            if (isset($_POST['check-arena-status'])) {
-                echo card('icon_pokeball.png', 'Arena Statuses', function() use($db) {
-                    $html = '';
-                    $arenas = $db->select('tblBattle GROUP BY arenaID ', 'arenaID, count(battleID) AS numOfBattles');
-                    $max = 0;
-                    foreach ($arenas as $arena) {
-                        if($arena['numOfBattles'] > $max){
-                            $max = $arena['numOfBattles'];
-                        }
-                    }
-                    foreach ($arenas as $arena) {
-                        if ($arenaName = $db->select('tblArena', 'name', "arenaID='" . $arena['arenaID'] . "'")) {
-                            $arenaName = $arenaName['0'];
-                            if($max == $arena['numOfBattles']){
-                                $html .= card('icon_pokeball.png', $arenaName['name']. '<span> [Most Popular Arena!] </span>' , $arena['numOfBattles']. " battles");
-                            }else{
-                                $html .= card('icon_pokeball.png', $arenaName['name'], $arena['numOfBattles']. " battles");
-                            }
-                        }
-                    }
-                    return $html;
-                    //<span>'. $arena['badge'] . '!</span>
-                });
-            }
-            ?>
-        </main>
-        
-        <footer>
-            <p>Simon Escaño and Malt Solon</p>
-            <p>BSCS-2</p>
-        </footer>
-    </section>
+                }
+            ),
+            card("icon_pokeball.png", "Pokemon Report",
+                form(null, ".flex-row",
+                    div(".form-input",
+                        label("type", "Pokemon Type"),
+                        select("type", "Normal", "Fire", "Water", "Electric", "Grass", "Ice", "Fighting", "Poison", "Ground", "Flying", "Psychic", "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy")
+                    ),
+                    button(null, ".report-button", "GO!")
+                ),
+                function() {
+                    if (isset($_POST['type'])) {
+                        $html = new HTML();
+                        $html->add(
+                            card("icon_pokeball.png", "Trainers with " . $_POST['type'] . "-type Pokemon",
+                                function() {
+                                    global $db;
+                                    $html = new HTML();
+                                    $trainerTypeInput = $_POST['type'];
+                                    $trainers = getPokemonTypes($db);
 
+                                    foreach ($trainers as $trainer) {
+                                        if($trainer['type11'] == $trainerTypeInput || $trainer['type21'] == $trainerTypeInput || $trainer['type12'] == $trainerTypeInput ||
+                                            $trainer['type22'] == $trainerTypeInput || $trainer['type13'] == $trainerTypeInput || $trainer['type23'] == $trainerTypeInput ||
+                                            $trainer['type14'] == $trainerTypeInput || $trainer['type24'] == $trainerTypeInput || $trainer['type15'] == $trainerTypeInput ||
+                                            $trainer['type25'] == $trainerTypeInput || $trainer['type16'] == $trainerTypeInput || $trainer['type26'] == $trainerTypeInput ||
+                                            $trainer['type17'] == $trainerTypeInput || $trainer['type27'] == $trainerTypeInput || $trainer['type18'] == $trainerTypeInput ||
+                                            $trainer['type28'] == $trainerTypeInput || $trainer['type19'] == $trainerTypeInput || $trainer['type29'] == $trainerTypeInput ||
+                                            $trainer['type110'] == $trainerTypeInput || $trainer['type210'] == $trainerTypeInput)
+                                        $html->add(p($trainer["trainerName"]));
+                                    }
+                                    return $html;
+                                }
+                            )
+                        );
+                        return $html;
+                    }
+                }
+            )
+        ),
+        card("icon_pokeball.png", "Arena Report",
+            form(null, ".flex-row",
+                div(".form-input",
+                    label("arena", "Arena"),
+                    select("arena", "Pewter City Gym", "Violet City Gym", "Rustboro City Gym", "Oreburgh City Gym", "Striaton City Gym", "Santalune City Gym", "Hau'oli City Gym", "Turffield Stadium")
+                ),
+                button(null, ".report-button", "GO!")
+            ),
+            function() {
+                if (isset($_POST['arena'])) {
+                    $html = new HTML();
+                    $html->add(
+                        card("icon_pokeball.png", "Battles in " . $_POST['arena'],
+                            function() {
+                                global $db;
+                                $html = new HTML();
+                                $arena = $db->select("tblArena", "arenaID", "name='". $_POST['arena'] ."'");
+                                if ($arena) {
+                                    $arena = $arena[0]['arenaID'];
+                                } else {
+                                    $arena = null;
+                                }
+                                $joins = [
+                                    ['tblTrainerAccount t1', 'b.firstOpponent = t1.trainerAccountID'],
+                                    ['tblTrainerAccount t2', 'b.secondOpponent = t2.trainerAccountID']
+                                ];
+                                $battles = $db->select('tblBattle b', 'b.*, t1.firstname AS firstOpponentName, t2.firstname AS secondOpponentName', "arenaID='$arena'", $joins);
+                                foreach ($battles as $battle) {
+                                    $html->add(
+                                        div('.battle',
+                                            div(".battle-header",
+                                                ($battle['isFirstOpponentWinner']) ? 
+                                                p(".battle-winner", "WINNER") . p(".battle-loser", "LOSER") : 
+                                                p(".battle-loser", "LOSER") . p(".battle-winner", "WINNER")
+                                            ),
+                                            div(".battle-body",
+                                                p($battle['firstOpponentName']),
+                                                p("VS."),
+                                                p($battle['secondOpponentName'])
+                                            ),
+                                            p(".battle-date", $battle['battleDate'])
+                                        )
+                                    );
+                                }
+                                return $html;
+                            }
+                        )
+                    );
+                    return $html;
+                }
+            }
+        ),
+    ),
+    footer(
+        p("Simon Escaño and Malt Solon"),
+        p("BSCS-2")
+    )
+)
+?>
     <script src="js/shared.js"></script>
 </body>
 </html>

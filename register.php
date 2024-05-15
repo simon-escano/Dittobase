@@ -128,9 +128,18 @@ require 'php/connect.php';
                                                         'userID' => $userID,
                                                         'trainerID' => $trainerID
                                                     ])) {
-                                                        header('Location: login.php');
-                                                        die();
+                                                        if ($db->insert('tblTrainerPokemon', [
+                                                            'trainerAccountID' => $trainerID,
+                                                        ])) {
+                                                            if ($db->insert('tblPokemonTeam', [
+                                                                'trainerAccountID' => $trainerID,
+                                                            ])) {
+                                                                header('Location: login.php');
+                                                                die();
+                                                            }
+                                                        }
                                                     }
+
                                                 }
                                             }
                                         } else {

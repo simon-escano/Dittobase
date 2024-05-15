@@ -35,8 +35,12 @@ class Database {
     }
     
 
-    public function select2($selectQuery) {
+    public function select2($selectQuery, $where = "") {
         $sql = $selectQuery;
+        if (!empty($where)) {
+            $sql .= " WHERE $where";
+        }
+
         $result = $this->query($sql);
 
         if (!$result) {
@@ -286,11 +290,95 @@ function is_single_assoc_array($array) {
 }
 
 function percent($total, $value, $string = false) {
-    $percent = ($value / $total) * 100;
+    $percent = null;
+    if (!$value) {
+        $percent = 0;
+    } else {
+        $percent = ($value / $total) * 100;
+    }
     if ($string) {
         $percent = intval($percent) . "%";
     }
     return $percent;
+}
+
+function getPokemonTypes($db, $where = "") {
+    return $db->select2("SELECT 
+        TA.firstname AS trainerName,
+        TP.pokemon1 AS spawnID1,
+        PD1.type1 AS type11,
+        PD1.type2 AS type21,
+        TP.pokemon2 AS spawnID2,
+        PD2.type1 AS type12,
+        PD2.type2 AS type22,
+        TP.pokemon3 AS spawnID3,
+        PD3.type1 AS type13,
+        PD3.type2 AS type23,
+        TP.pokemon4 AS spawnID4,
+        PD4.type1 AS type14,
+        PD4.type2 AS type24,
+        TP.pokemon5 AS spawnID5,
+        PD5.type1 AS type15,
+        PD5.type2 AS type25,
+        TP.pokemon6 AS spawnID6,
+        PD6.type1 AS type16,
+        PD6.type2 AS type26,
+        TP.pokemon7 AS spawnID7,
+        PD7.type1 AS type17,
+        PD7.type2 AS type27,
+        TP.pokemon8 AS spawnID8,
+        PD8.type1 AS type18,
+        PD8.type2 AS type28,
+        TP.pokemon9 AS spawnID9,
+        PD9.type1 AS type19,
+        PD9.type2 AS type29,
+        TP.pokemon10 AS spawnID10,
+        PD10.type1 AS type110,
+        PD10.type2 AS type210
+    FROM 
+        tblTrainerAccount AS TA
+    JOIN 
+        tblTrainerPokemon AS TP ON TA.trainerAccountID = TP.trainerAccountID
+    LEFT JOIN 
+        tblPokemon AS P1 ON TP.pokemon1 = P1.spawnID
+    LEFT JOIN 
+        tblPokedex AS PD1 ON P1.pokedexID = PD1.pokedexID
+    LEFT JOIN 
+        tblPokemon AS P2 ON TP.pokemon2 = P2.spawnID
+    LEFT JOIN 
+        tblPokedex AS PD2 ON P2.pokedexID = PD2.pokedexID
+    LEFT JOIN 
+        tblPokemon AS P3 ON TP.pokemon3 = P3.spawnID
+    LEFT JOIN 
+        tblPokedex AS PD3 ON P3.pokedexID = PD3.pokedexID
+    LEFT JOIN 
+        tblPokemon AS P4 ON TP.pokemon4 = P4.spawnID
+    LEFT JOIN 
+        tblPokedex AS PD4 ON P4.pokedexID = PD4.pokedexID
+    LEFT JOIN 
+        tblPokemon AS P5 ON TP.pokemon5 = P5.spawnID
+    LEFT JOIN 
+        tblPokedex AS PD5 ON P5.pokedexID = PD5.pokedexID
+    LEFT JOIN 
+        tblPokemon AS P6 ON TP.pokemon6 = P6.spawnID
+    LEFT JOIN 
+        tblPokedex AS PD6 ON P6.pokedexID = PD6.pokedexID
+    LEFT JOIN 
+        tblPokemon AS P7 ON TP.pokemon7 = P7.spawnID
+    LEFT JOIN 
+        tblPokedex AS PD7 ON P7.pokedexID = PD7.pokedexID
+    LEFT JOIN 
+        tblPokemon AS P8 ON TP.pokemon8 = P8.spawnID
+    LEFT JOIN 
+        tblPokedex AS PD8 ON P8.pokedexID = PD8.pokedexID
+    LEFT JOIN 
+        tblPokemon AS P9 ON TP.pokemon9 = P9.spawnID
+    LEFT JOIN 
+        tblPokedex AS PD9 ON P9.pokedexID = PD9.pokedexID
+    LEFT JOIN 
+        tblPokemon AS P10 ON TP.pokemon10 = P10.spawnID
+    LEFT JOIN 
+        tblPokedex AS PD10 ON P10.pokedexID = PD10.pokedexID;", $where);
 }
 
 ?>

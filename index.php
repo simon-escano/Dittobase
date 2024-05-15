@@ -147,8 +147,17 @@ if (!isset($_SESSION['pokedexIndex'])) {
                                 $numOfWins = $data["totalWins"];
 
                                 return
-                                pieChart(['Total battles: ' => $numOfBattles],  ['Wins' => $numOfWins], ['Losses' => $numOfBattles - $numOfWins]);
-                            }
+                                pieChart(['Total battles' => $numOfBattles],  ['Wins' => $numOfWins], ['Losses' => $numOfBattles - $numOfWins]);
+                            },  
+                            "#dashboard",
+                            div("bar-chart flex-1",
+                                div("bar-chart-header",
+                                    p("bar-chart-title", "Your pokemon types")
+                                ),
+                                function() use($db, $currentUser) {
+                                    $types = getPokemonTypes($db, "trainerAccountID=$currentUser");
+                                }
+                            )
                         )
                     ) : "",
                     part('v',

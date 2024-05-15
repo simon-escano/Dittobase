@@ -838,3 +838,57 @@ header, footer {
     text-align: center;
     margin-top: -2px;
 }
+
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+}
+
+.bar-chart-header {
+    display: flex;
+}
+
+.bar-chart-elems {
+    display: flex;
+    height: 100%;
+    gap: 6px;
+    align-items: flex-end;
+}
+
+.bar-chart-elem {
+    padding: 4px;
+    flex: 1;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    background-color: var(--primary-dark);
+}
+
+#dashboard {
+    > .card-content {
+        flex-direction: row;
+    }
+}
+
+.elem-1 {
+    height: 30%;
+}
+
+.elem-2 {
+    height: 20%;
+}
+
+.elem-3 {
+    height: 50%;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.flex-column {
+    flex-direction: column;
+}

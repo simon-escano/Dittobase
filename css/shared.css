@@ -842,22 +842,63 @@ header, footer {
 .bar-chart {
     display: flex;
     flex-direction: column;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    background-color: var(--primary-dark);
 }
 
 .bar-chart-header {
     display: flex;
+    flex-direction: column;
+}
+
+.bar-chart-title {
+    padding: 3px 6px;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    background-color: var(--primary);
 }
 
 .bar-chart-elems {
     display: flex;
+    flex: 1;
     height: 100%;
     gap: 6px;
     align-items: flex-end;
+    padding: 6px;
 }
 
 .bar-chart-elem {
+    position: relative;
     padding: 4px;
     flex: 1;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    background-color: var(--primary-dark);
+}
+
+.bar-chart-elem-amount {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.bar-chart-legends {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+    padding: 6px;
+}
+
+.bar-chart-legend {
+    display: flex;
+    gap: 6px;
+}
+
+.bar-chart-legend-color {
+    padding: 6px;
     border: var(--outline);
     box-shadow: var(--shadow-emboss);
     background-color: var(--primary-dark);
@@ -866,19 +907,8 @@ header, footer {
 #dashboard {
     > .card-content {
         flex-direction: row;
+        gap: 16px;
     }
-}
-
-.elem-1 {
-    height: 30%;
-}
-
-.elem-2 {
-    height: 20%;
-}
-
-.elem-3 {
-    height: 50%;
 }
 
 .flex-1 {

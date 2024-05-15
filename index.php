@@ -148,16 +148,45 @@ if (!isset($_SESSION['pokedexIndex'])) {
 
                                 return
                                 pieChart(['Total battles' => $numOfBattles],  ['Wins' => $numOfWins], ['Losses' => $numOfBattles - $numOfWins]);
-                            },  
-                            "#dashboard",
+                            },
                             div("bar-chart flex-1",
                                 div("bar-chart-header",
-                                    p("bar-chart-title", "Your pokemon types")
+                                    p("bar-chart-title", "Your pokemon types"),
+                                    div("bar-chart-legends",
+                                        function() {
+                                            $html = "";
+                                            $types = getTypes();
+                                            foreach ($types as $key => $value) {
+                                                $html .=
+                                                div("bar-chart-legend",
+                                                    barChartLegend($key, $value)
+                                                );
+                                            }
+
+                                            return $html;
+                                        },
+                                        div ("bar-chart-legend",
+                                        )
+                                    )
                                 ),
-                                function() use($db, $currentUser) {
-                                    $types = getPokemonTypes($db, "TA.trainerAccountID=$currentUser");
-                                }
-                            )
+                                div("bar-chart-elems",
+                                    function() use($db, $currentUser) {
+                                        $html = "";
+                                        $types = getPokemonTypes($db, "TA.trainerAccountID=$currentUser");
+                                        $typeCount = typeCounter($types[0]);
+                                        $typeColors = getTypes();
+                                        $total = $typeCount["total"];
+
+                                        foreach ($typeCount as $type => $value) {
+                                            if (!$value || $type == "total") continue;
+                                            $html .= barChartElem(percent($total, $value, true), $typeColors[$type], p("bar-chart-elem-amount", $value));
+                                        }
+                                        
+                                        return $html;
+                                    }
+                                )
+                            ),
+                            "#dashboard",
                         )
                     ) : "",
                     part('v',

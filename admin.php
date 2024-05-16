@@ -68,10 +68,42 @@ echo section("#container",
                                 function() {
                                     global $db;
                                     $html = new HTML();
-                                    $kantoTrainers = $db->select('tblUser', 'username', 'region="' . $_POST['region'] . '"');
-                                    foreach ($kantoTrainers as $kantoTrainer) {
-                                        $html->add(p($kantoTrainer['username']));
+                                    $region = $_POST['region'];
+                                    $columns = 't.trainerAccountID, t.firstname';
+                                    $trainers = $db->select(
+                                        'tblTrainerAccount t',
+                                        $columns,
+                                        "t.region='$region'",
+                                        [
+                                            ['tblTrainerPokemon tp', 't.trainerAccountID = tp.trainerAccountID'],
+                                        ]
+                                    );
+
+                                    foreach ($trainers as $trainer) {
+                                        $trainerHTML = new HTML();
+
+                                        $trainerPokemon = $db->select_one(
+                                            'tblTrainerPokemon',
+                                            '*',
+                                            "trainerAccountID='" . $trainer['trainerAccountID'] . "'"
+                                        );
+
+                                        for ($i = 1; $i <= 10; $i++) {
+                                            $pokemonID = $trainerPokemon['pokemon' . $i];
+                                            if ($pokemonID) {
+                                                $pokemon = $db->select_one(
+                                                    'tblPokemon p',
+                                                    'p.pokedexID, pd.name',
+                                                    "p.spawnID='$pokemonID'",
+                                                    [['tblPokedex pd', 'p.pokedexID = pd.pokedexID']]
+                                                );
+                                                $trainerHTML->add(p($pokemon['name'], '.pink-text'));
+                                            }
+                                        }
+
+                                        $html->add(card("icon_pokeball.png", $trainer['firstname'] . "'s Pokemon", $trainerHTML->toString()));
                                     }
+
                                     return $html;
                                 }
                             )
@@ -96,19 +128,27 @@ echo section("#container",
                                 function() {
                                     global $db;
                                     $html = new HTML();
-                                    $trainerTypeInput = $_POST['type'];
+                                    $inputType = $_POST['type'];
                                     $trainers = getPokemonTypes($db);
 
                                     foreach ($trainers as $trainer) {
-                                        if($trainer['type11'] == $trainerTypeInput || $trainer['type21'] == $trainerTypeInput || $trainer['type12'] == $trainerTypeInput ||
-                                            $trainer['type22'] == $trainerTypeInput || $trainer['type13'] == $trainerTypeInput || $trainer['type23'] == $trainerTypeInput ||
-                                            $trainer['type14'] == $trainerTypeInput || $trainer['type24'] == $trainerTypeInput || $trainer['type15'] == $trainerTypeInput ||
-                                            $trainer['type25'] == $trainerTypeInput || $trainer['type16'] == $trainerTypeInput || $trainer['type26'] == $trainerTypeInput ||
-                                            $trainer['type17'] == $trainerTypeInput || $trainer['type27'] == $trainerTypeInput || $trainer['type18'] == $trainerTypeInput ||
-                                            $trainer['type28'] == $trainerTypeInput || $trainer['type19'] == $trainerTypeInput || $trainer['type29'] == $trainerTypeInput ||
-                                            $trainer['type110'] == $trainerTypeInput || $trainer['type210'] == $trainerTypeInput)
-                                        $html->add(p($trainer["trainerName"]));
+                                        $trainerHTML = new HTML();
+                                        for ($i = 1; $i <= 10; $i++) {
+                                            if ($trainer['type1' . $i] == $inputType) {
+                                                $trainerHTML->add(p($trainer['name' . $i]));
+                                            }
+                                            if ($trainer['type2' . $i] == $inputType) {
+                                                $trainerHTML->add(p($trainer['name' . $i]));
+                                            }
+                                        }
+                                        
+                                        if (!empty($trainerHTML->toString())) {
+                                            $html->add(
+                                                card("icon_pokeball.png", $trainer['trainerName'], $trainerHTML)
+                                            );
+                                        }
                                     }
+
                                     return $html;
                                 }
                             )

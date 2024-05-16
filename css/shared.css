@@ -972,3 +972,10 @@ header, footer {
     height: 100%;
     text-wrap: nowrap;
 }
+
+.pink-text {
+    border: var(--outline);
+    background-color: var(--secondary);
+    box-shadow: var(--shadow-emboss);
+    padding: 3px 6px;
+}

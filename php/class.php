@@ -330,4 +330,7 @@ function countPokemon($db, $trainerID) {
     return $rows[0]['total_count'];
 }
 
+function getTrainerPokemon($region) {
+}
+
 ?>

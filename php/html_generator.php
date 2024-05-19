@@ -24,6 +24,7 @@ function html($elem, ...$args) {
         "class" => "",
         "style" => ""
     ];
+    $attr_str = "";
     $contents = "";
     foreach ($args as $arg) {
         if (is_callable($arg)) $arg = $arg();
@@ -49,12 +50,14 @@ function html($elem, ...$args) {
             case "@":
                 $attrs["src"] = $shifted_str;
                 break;
+            case "!":
+                $attr_str .= "required ";
+                break;
             default:
                 $contents .= $arg;
         }
     }
 
-    $attr_str = "";
     foreach ($attrs as $key => $value) {
         if ($value) {
             $attr_str .= $key;
@@ -124,7 +127,14 @@ function input($type, $name, $value, ...$args) {
     return html("input", ["type" => $type, "name" => $name, "value" => $value], ...$args);
 }
 
+function textarea($type, $name, $value, ...$args) {
+    return html("textarea", ["type" => $type, "name" => $name, "value" => $value], ...$args);
+}
+
 function button($action, ...$args) {
+    if ($action == " ") {
+        return html("button", ["type" => "submit"], ...$args);
+    }
     if (!$action) {
         return html("button", ...$args);
     }
@@ -138,6 +148,9 @@ function button($action, ...$args) {
         } else {
             $unused_args[] = $arg;
         }
+    }
+    if ($action == ".") {
+        $action = "";
     }
     return
     form($action,
@@ -244,6 +257,154 @@ function barChartLegend($name, $color) {
     <div class='bar-chart-legend-color'
         style='background-color: ". $color ."'
     ></div>" . p("bar-chart-legend-title", $name);
+}
+
+function generatePokedexResult($pokemon) {
+    return div(".pokedex-result",
+        div(".pokedex-header", 
+            p(".pokedex-name", $pokemon['name']),
+            hbox('.non-flex',
+                p(".pokedex-type", $pokemon['type1']),
+                $pokemon['type2'] != "None" ? p(".pokedex-type", $pokemon['type2']) : ""
+            )
+        ),
+        div(".pokedex-body",
+            img($pokemon['image'], ".pokedex-image"),
+            p(".pokedex-description", $pokemon['description'])
+        ),
+        div(".pokedex-moves",
+            $pokemon['name'], "'s moves",
+            hbox(
+                p(".pokedex-type", $pokemon['move1']),
+                p(".pokedex-type", $pokemon['move2']),
+                p(".pokedex-type", $pokemon['move3']),
+            )
+        )
+    );
+}
+
+function generateEditPokedexResult($pokemon) {
+    return form("edit_pokemon", ".pokedex-result",
+        div(".pokedex-header",
+            input("text", "name", $pokemon['name'], ".pokedex-name", "!"),
+            hbox('.non-flex',
+                input("text", "type1", $pokemon['type1'], ".pokedex-type", "!"),
+                input("text", "type2", $pokemon['type2'], ".pokedex-type", "!")
+            )
+        ),
+        div(".pokedex-body",
+            img($pokemon['image'], ".pokedex-image"),
+            textarea("text", "description", $pokemon['description'], ".pokedex-description", $pokemon['description'], "!"),
+        ),
+        div(".pokedex-moves",
+            $pokemon['name'], "'s moves",
+            hbox(
+                input("text", "move1", $pokemon['move1'], ".pokedex-type", "!"),
+                input("text", "move2", $pokemon['move2'], ".pokedex-type", "!"),
+                input("text", "move3", $pokemon['move3'], ".pokedex-type", "!")
+            )
+        ),
+        div(".pokedex-result-buttons",
+            button(" ", "UPDATE", ["name" => "pokedexID", "value" => $pokemon["pokedexID"]], ".pokedex-update-btn"),
+            button(" ", "DELETE", ["name" => "delete", "value" => "true"], ".pokedex-delete-btn")
+        )
+    );
+}
+
+function generateBlankPokedexResult() {
+    return form("create_pokemon", ".pokedex-result", ".blank-pokedex-result",
+        div(".pokedex-header",
+            input("text", "name", "", ".pokedex-name", "!", ["placeholder" => "Name"]),
+            hbox('.non-flex',
+                input("text", "type1", "", ".pokedex-type", "!", ["placeholder" => "Type 1"]),
+                input("text", "type2", "", ".pokedex-type", "!", ["placeholder" => "Type 2"])
+            )
+        ),
+        div(".pokedex-body",
+            div(".pokedex-body-left",
+                input("text", "isStarter", "", ".pokedex-is-starter", ["placeholder" => "Starter?"]),
+                textarea("text", "image", "", ".pokedex-image-src", "!", ["placeholder" => "Image Link"])
+            ),
+            div(".pokedex-body-right",
+                input("text", "region", "", ".pokedex-region", ["placeholder" => "Region"]),
+                textarea("text", "description", "", ".pokedex-description", "!", ["placeholder" => "Description"])
+            )
+        ),
+        div(".pokedex-moves",
+            hbox(
+                input("text", "move1", "", ".pokedex-type", "!", ["placeholder" => "Move 1"]),
+                input("text", "move2", "", ".pokedex-type", "!", ["placeholder" => "Move 2"]),
+                input("text", "move3", "", ".pokedex-type", "!", ["placeholder" => "Move 3"])
+            )
+        ),
+        div(".pokedex-result-buttons",
+            button(" ", "CREATE", ["name" => "create"], ".pokedex-create-btn"),
+        )
+    );
+}
+
+function generatePokedex($pokedex, $content, ...$args) {
+    $create = false;
+    foreach ($args as $arg) {
+        $first_char = substr($arg, 0, 1);
+        if ($first_char == "+") {
+            $create = true;
+        }
+    }
+    if (is_callable($content)) {
+        $content = $content();
+    }
+    return div("#pokedex", ".pokedex",
+        div(".pokedex-top",
+            div(".pokedex-top-left",
+                div(".pokedex-lens",
+                    div(".pokedex-lens-glass")
+                ),
+                div(".pokedex-top-button red"),
+                div(".pokedex-top-button yellow"),
+                div(".pokedex-top-button green")
+            ),
+            div(".pokedex-top-right",
+                div(".pokedex-top-right-box",
+                    p("", "POKEDEX")
+                )
+            )
+        ),
+        div(".pokedex-bottom",
+            div(".pokedex-screen",
+                div(".pokedex-screen-content",
+                    $content
+                ),
+                div(".pokedex-screen-buttons",
+                    div(".pokedex-screen-button"),
+                    ($create) ? button(".", ["create" => ""], "Create", ".pokedex-create-btn") : "",
+                    div(".pokedex-speaker",
+                        "<hr>", "<hr>", "<hr>", "<hr>",
+                    )
+                )
+            ),
+            div(".pokedex-buttons",
+                button("decrement_pokedex", ".pokedex-button", "<", ["page" => getPage()]),
+                div(".pokedex-button-group",
+                    div(".pokedex-line-buttons",
+                        div(".pokedex-line-button red"),
+                        div(".pokedex-line-button blue"),
+                    ),
+                    div(".pokedex-trackpad",
+                        form("",
+                            input("text", "search", null, ".pokedex-input", ["placeholder" => "Search"], "!"),
+                            div(".pokedex-search-buttons",
+                                button(" ", ["name" => "query", "value" => "name"], "Search by name"),
+                                button(" ", ["name" => "query", "value" => "types"], "Search by types"),
+                                button(" ", ["name" => "query", "value" => "moves"], "Search by moves")
+                            )
+                        )
+                    )
+                ),
+                button("increment_pokedex", ".pokedex-button", ">", ["limit" => count($pokedex) - 1, "page" => getPage()])
+            )
+        )
+    );
 }
 
 ?>

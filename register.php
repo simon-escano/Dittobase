@@ -54,6 +54,10 @@ require 'php/connect.php';
                             </div>
                         </div>
                         <div class="form-input">
+                            <label for="birthdate">Birthdate</label>
+                            <input type="date" id="birthdate" name="birthdate" required>
+                        </div>
+                        <div class="form-input">
                             <label for="region">Region</label>
                             <select id="region" name="region">
                                 <option value="Kanto">Kanto</option>
@@ -81,25 +85,35 @@ require 'php/connect.php';
 
                         <?php
                             if (!empty($_POST)) {
-                                if (isset($_POST['firstname'], $_POST['lastname'], $_POST['email'], $_POST['region'], $_POST['username'], $_POST['password'])) {
+                                if (isset($_POST['firstname'], $_POST['lastname'], $_POST['birthdate'], $_POST['email'], $_POST['region'], $_POST['username'], $_POST['password'])) {
                                     $firstname = $_POST['firstname'];
                                     $lastname = $_POST['lastname'];
+                                    $birthdate = $_POST['birthdate'];
                                     $email = $_POST['email'];
                                     $region = $_POST['region'];
                                     $username = $_POST['username'];
                                     $password = $_POST['password'];
                             
-                                    if (!empty($firstname) && !empty($lastname) && !empty($email) && !empty($region) && !empty($username) && !empty($password)) {
+                                    if (!empty($firstname) && !empty($lastname) && !empty($birthdate) && !empty($email) && !empty($region) && !empty($username) && !empty($password)) {
                                         $err = null;
-                                        $userAccounts = $db->select("tblUserAccount");
-                                        foreach ($userAccounts as $user) {
-                                            if ($user['emailAdd'] == $email) {
-                                                $err = "Someone already has that email, Brah!";
-                                                break;
-                                            }
-                                            if ($user['username'] == $username) {
-                                                $err = "Someone already has that username, Brah!";
-                                                break;
+                                        list($isValid, $message) = isValid($password);
+                                        if (!$isValid) {
+                                            $err = $message;
+                                        }
+                                        if (calculateYears($birthdate) < 16) {
+                                            $err = "You need to be at least 16 years old to be a trainer.";
+                                        }
+                                        if (!$err) {
+                                            $userAccounts = $db->select("tblUserAccount");
+                                            foreach ($userAccounts as $user) {
+                                                if ($user['emailAdd'] == $email) {
+                                                    $err = "Someone already has that email, Brah!";
+                                                    break;
+                                                }
+                                                if ($user['username'] == $username) {
+                                                    $err = "Someone already has that username, Brah!";
+                                                    break;
+                                                }
                                             }
                                         }
                             
@@ -115,10 +129,11 @@ require 'php/connect.php';
                                                 if ($db->insert('tblTrainerAccount', [
                                                     'firstname' => $firstname,
                                                     'lastname' => $lastname,
-                                                    'birthdate' => '2004-06-10',
+                                                    'birthdate' => $birthdate,
                                                     'region' => $region,
                                                     'team' => 'Mystic',
-                                                    'type' => 'Normal'
+                                                    'type' => 'Normal',
+                                                    'numOfBadges' => 0
                                                 ])) {
                                                     $trainerID = (($db->query("SELECT trainerAccountID FROM tblTrainerAccount ORDER BY trainerAccountID DESC LIMIT 1;"))->fetch_assoc())['trainerAccountID'];
                                                     if ($db->insert('tblUserAccount', [

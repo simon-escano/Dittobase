@@ -516,11 +516,16 @@ header, footer {
 
 .pokedex-screen-content {
     display: flex;
+    flex-direction: column;
     background-color: var(--black);
     padding: 8px;
     border: var(--outline);
     box-shadow: var(--deshadow-deboss);
     border-radius: 4px;
+    gap: 6px;
+    min-height: 240px;
+    max-height: 280px;
+    overflow: auto;
 }
 
 .pokedex-screen-buttons {
@@ -610,22 +615,57 @@ header, footer {
     width: 100%;
     flex-direction: column;
     background-color: white;
+
+    input, textarea {
+        box-shadow: var(--deshadow-deboss);
+        resize: none;
+        color: white;
+        text-shadow: var(--text-outline);
+    }
+
+    .pokedex-image-src {
+        flex: 1.5;
+        padding: 3px 6px;
+        color: var(--primary);
+        text-shadow: none;
+    }
+
+    textarea {
+        height: 100%;
+    }
+
+    .pokedex-name {
+        flex: 1;
+        width: 100%;
+    }
+
+    .hbox {
+        flex: 1;
+    }
+}
+
+form.pokedex-result {
+    gap: 0px;
+    > div {
+        width: 100%;
+    }
 }
 
 .pokedex-header {
     display: flex;
     width: 100%;
     justify-content: space-between;
-    align-items: center;
     padding: 4px;
     padding-left: 12px;
     background-color: var(--primary);
     border: var(--outline);
     box-shadow: var(--shadow-emboss);
+    gap: 6px;
 }
 
 .pokedex-name {
     font-size: 20px;
+    height: 100%;
 }
 
 .pokedex-type {
@@ -643,6 +683,28 @@ header, footer {
     box-shadow: var(--shadow-emboss);
     margin-top: -2px;
     overflow-x: auto;
+}
+
+.pokedex-result-buttons {
+    display: flex;
+    width: 100%;
+    button {
+        width: 100%;
+        border: var(--outline);
+        box-shadow: var(--shadow-emboss);
+        padding: 6px;
+        font-size: 16px;
+    }
+    .pokedex-update-btn, .pokedex-create-btn {
+        background-color: var(--green);
+    }
+    .pokedex-delete-btn {
+        background-color: var(--red);
+    }
+    .pokedex-create-btn {
+        color: var(--white);
+        text-shadow: var(--text-outline);
+    }
 }
 
 .pokedex-description {
@@ -978,4 +1040,114 @@ header, footer {
     background-color: var(--secondary);
     box-shadow: var(--shadow-emboss);
     padding: 3px 6px;
+}
+
+.pokedex-input {
+    background-color: var(--green);
+}
+
+.pokedex-input::placeholder {
+    color: var(--primary-outline);
+}
+
+.pokedex-search-buttons {
+    width: 100%;
+
+    button {
+        width: 100%;
+        padding: 3px 6px;
+        background-color: var(--green);
+        outline: none;
+        border: var(--outline);
+        box-shadow: var(--shadow-emboss);
+        margin-bottom: -2px;
+        color: var(--primary-outline);
+        text-shadow: none;
+    }
+}
+
+.invisible {
+    display: none;
+}
+
+
+.edit-user-form {
+    flex-direction: row;
+    gap: 0px;
+    align-items: baseline;
+
+    * {
+        margin-right: -2px;
+    }
+}
+
+.user-id {
+    max-width: 32px;
+}
+
+.edit-user-update-btn, .edit-user-delete-btn {
+    outline: none;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    margin-bottom: -2px;
+    padding: 3px 6px;
+    height: 100%;
+}
+
+.edit-user-update-btn {
+    background-color: var(--green);
+}
+
+.edit-user-delete-btn {
+    background-color: var(--red);
+}
+
+.pokedex-screen-buttons {
+    form {
+        width: 100%;
+    }
+}
+
+.pokedex-create-btn {
+    outline: none;
+    border: var(--outline);
+    box-shadow: var(--shadow-emboss);
+    margin-bottom: -2px;
+    padding: 3px 6px;
+    color: black;
+    text-shadow: none;
+    flex: 1;
+    width: 100%;
+}
+
+.blank-pokedex-result {
+    flex: 1;
+
+    .pokedex-body {
+        flex: 1;
+        gap: 3px;
+    }
+
+    input::placeholder, textarea::placeholder {
+        color: var(--primary-dark);
+        text-shadow: none;
+    }
+
+    .pokedex-description {
+        width: 100%;
+    }
+}
+
+.pokedex-body-left, .pokedex-body-right {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.pokedex-body-left {
+    max-width: 100px;
+}
+
+.pokedex-is-starter, .pokedex-region {
+    flex: 0.3;
 }

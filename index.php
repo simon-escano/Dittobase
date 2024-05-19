@@ -107,7 +107,8 @@ echo section("#container",
                 ),
                 card("icon_pokeball.png", "YOUR POKEMON [" . countPokemon($db, $currentUser) . "]",
                     div("#your-pokemon", ".pokemons",
-                        function() use($db, $currentUser) {
+                        function() {
+                            global $db, $currentUser;
                             $html = new HTML();
                             $joins = [
                                 ['tblPokemon p', 'p.spawnID = t.pokemon1 OR p.spawnID = t.pokemon2 OR p.spawnID = t.pokemon3 OR p.spawnID = t.pokemon4 OR p.spawnID = t.pokemon5 OR p.spawnID = t.pokemon6 OR p.spawnID = t.pokemon7 OR p.spawnID = t.pokemon8 OR p.spawnID = t.pokemon9 OR p.spawnID = t.pokemon10'],
@@ -168,7 +169,8 @@ echo section("#container",
                             )
                         ),
                         div(".bar-chart-elems",
-                            function() use($db, $currentUser) {
+                            function() {
+                                global $db, $currentUser;
                                 $html = new HTML();
                                 $types = getPokemonTypes($db, "TA.trainerAccountID=$currentUser");
                                 $typeCount = typeCounter($types[0]);
@@ -214,66 +216,38 @@ echo section("#container",
                 )
             ),
             hbox(
-                div("#pokedex", ".pokedex",
-                    div(".pokedex-top",
-                        div(".pokedex-top-left",
-                            div(".pokedex-lens",
-                                div(".pokedex-lens-glass")
-                            ),
-                            div(".pokedex-top-button red"),
-                            div(".pokedex-top-button yellow"),
-                            div(".pokedex-top-button green")
-                        ),
-                        div(".pokedex-top-right",
-                            div(".pokedex-top-right-box",
-                                p("", "POKEDEX")
-                            )
-                        )
-                    ),
-                    div(".pokedex-bottom",
-                        div(".pokedex-screen",
-                            div(".pokedex-screen-content",
-                                div(".pokedex-result",
-                                    div(".pokedex-header", 
-                                        p(".pokedex-name", $pokedex[$_SESSION['pokedexIndex']]['name']),
-                                        hbox('.non-flex',
-                                            p(".pokedex-type", $pokedex[$_SESSION['pokedexIndex']]['type1']),
-                                            $pokedex[$_SESSION['pokedexIndex']]['type2'] != "None" ? p(".pokedex-type", $pokedex[$_SESSION['pokedexIndex']]['type2']) : ""
-                                        )
-                                    ),
-                                    div(".pokedex-body",
-                                        img($pokedex[$_SESSION['pokedexIndex']]['image'], ".pokedex-image"),
-                                        p(".pokedex-description", $pokedex[$_SESSION['pokedexIndex']]['description'])
-                                    ),
-                                    div(".pokedex-moves",
-                                        $pokedex[$_SESSION['pokedexIndex']]['name'], "'s moves",
-                                        hbox(
-                                            p(".pokedex-type", $pokedex[$_SESSION['pokedexIndex']]['move1']),
-                                            p(".pokedex-type", $pokedex[$_SESSION['pokedexIndex']]['move2']),
-                                            p(".pokedex-type", $pokedex[$_SESSION['pokedexIndex']]['move3']),
-                                        )
-                                    )
-                                )
-                            ),
-                            div(".pokedex-screen-buttons",
-                                div(".pokedex-screen-button"),
-                                div(".pokedex-speaker",
-                                    "<hr>", "<hr>", "<hr>", "<hr>",
-                                )
-                            )
-                        ),
-                        div(".pokedex-buttons",
-                            button("decrement_pokedex", ".pokedex-button", "<"),
-                            div(".pokedex-button-group",
-                                div(".pokedex-line-buttons",
-                                    div(".pokedex-line-button red"),
-                                    div(".pokedex-line-button blue"),
-                                ),
-                                div(".pokedex-trackpad")
-                            ),
-                            button("increment_pokedex", ".pokedex-button", ">", ["limit" => count($pokedex) - 1])
-                        )
-                    )
+                generatePokedex($pokedex,
+                    function() {
+                        global $db, $pokedex;
+                        $html = new HTML();
+                        if (isset($_POST['search'])) {
+                            $search = $_POST['search'];
+                            $searched = "";
+                            switch ($_POST['query']) {
+                                case "name":
+                                    $where = "LOWER(name) LIKE LOWER('%$search%')";
+                                    $searched = $db->select("tblPokedex", "*", $where);
+                                    break;
+                                case "types":
+                                    $where = "LOWER(type1) LIKE LOWER('%$search%') OR LOWER(type2) LIKE LOWER('%$search%')";
+                                    $searched = $db->select("tblPokedex", "*", $where);
+                                    break;
+                                case "moves":
+                                    $where = "LOWER(move1) LIKE LOWER('%$search%') OR LOWER(move2) LIKE LOWER('%$search%') OR LOWER(move3) LIKE LOWER('%$search%')";
+                                    $searched = $db->select("tblPokedex", "*", $where);
+                                    break;
+                            }                                      
+                            if (!$searched) {
+                                return "No results for " . $search . " by " . $_POST['query'];
+                            }
+                            foreach ($searched as $res) {
+                                $html->add(generatePokedexResult($res));
+                            }
+                            return $html;
+                        } else {
+                            return generatePokedexResult($pokedex[$_SESSION['pokedexIndex']]);
+                        }
+                    }
                 ),
                 card("icon_pokeball.png", "BATTLES",
                     div(".battles",

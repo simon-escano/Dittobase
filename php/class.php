@@ -333,4 +333,40 @@ function countPokemon($db, $trainerID) {
 function getTrainerPokemon($region) {
 }
 
+function calculateYears($inputDate) {
+    $date = new DateTime($inputDate);
+    $now = new DateTime();
+    $interval = $now->diff($date);
+    return $interval->y;
+}
+
+function isValid($password) {
+    $badPasswords = [
+        '123456', 'password', '123456789', '12345678', '12345', '1234567', 'qwerty', 'abc123'
+    ];
+    if (strlen($password) < 8) {
+        return [false, 'Password must be at least 8 characters long.'];
+    }
+    if (in_array($password, $badPasswords)) {
+        return [false, 'Password is too common and easy to guess.'];
+    }
+    if (!preg_match('/[A-Z]/', $password)) {
+        return [false, 'Password must contain at least one uppercase letter.'];
+    }
+    if (!preg_match('/[a-z]/', $password)) {
+        return [false, 'Password must contain at least one lowercase letter.'];
+    }
+    if (!preg_match('/\d/', $password)) {
+        return [false, 'Password must contain at least one number.'];
+    }
+    if (!preg_match('/[\W_]/', $password)) {
+        return [false, 'Password must contain at least one special character.'];
+    }
+    return [true, 'Password is valid.'];
+}
+
+function getPage() {
+    return basename($_SERVER['PHP_SELF']);
+}
+
 ?>
